@@ -1,6 +1,6 @@
-package com.tcn;
+package com.tcn.vera;
 
-public class Main {
+public class Vera {
     public static void main(String[] args) {
         System.out.println("Hello world!");
     }
