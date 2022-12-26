@@ -110,7 +110,7 @@ public class CommandHandler extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         CommandTemplate command = slashCommandSet.stream().filter(
-                p -> p.getCommandName().equalsIgnoreCase(event.getFullCommandName())
+                p -> p.getSlashCommand().getName().equalsIgnoreCase(event.getFullCommandName())
         ).findFirst().orElse(null);
 
         if(null != command){
@@ -121,12 +121,14 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+
+        //once JDA is ready we can actually send the new slash commands to discord
         List<CommandData> slashCommandList = new ArrayList<>();
         for (CommandTemplate command : slashCommandSet){
             slashCommandList.add(command.getSlashCommand());
         }
         event.getJDA().updateCommands().addCommands(slashCommandList).queue();
-        logger.info("Registered" + slashCommandSet.size() + " slash commands");
+        logger.info("Registered " + slashCommandSet.size() + " slash commands");
     }
 
     private void executeChatCommand(CommandTemplate template, MessageReceivedEvent event, String messageContent){

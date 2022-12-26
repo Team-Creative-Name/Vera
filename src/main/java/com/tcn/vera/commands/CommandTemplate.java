@@ -37,6 +37,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * This is the command template class. Any command executed via Vera should extend this class in some fashion. This command
@@ -53,6 +54,8 @@ import java.util.Arrays;
  *         this.isOwnerCommand = true;
  *         this.chatHelp = "This command does a thing";
  *         this.slashHelp = "This command does something slightly differently";
+ *         this.slashCommand = Commands.slash(getCommandName(), "a slash command example")
+ *                 .addOption(OptionType.INTEGER, "number", "a random numer", true);
  *     }
  * }</pre>
  *
@@ -100,6 +103,13 @@ public abstract class CommandTemplate {
     * discord to invoke the command.
     */
    protected boolean allowChatCommand = true;
+
+   /**
+    * If <code>allowSlashCommand == true</code>, this is what is passed to discord to show in the slash command GUI. If you
+    * do not require any special arguments, Vera will automatically generate a slash command for you and this can be left
+    * as null.
+    */
+   protected CommandData slashCommand = null;
 
    private static final CommandCache<Long, TLongSet> MESSAGE_LINK_MAP = new CommandCache<>(20);
 
@@ -152,9 +162,15 @@ public abstract class CommandTemplate {
       return array;
    }
 
+   /**
+    * If <code>allowSlashCommand == true</code>, this returns the slashCommand field. If it was not created, it will generate
+    * a slash command via the commandName and slashHelp fields. This returns null if <code>allowSlashCommand == false</code>
+    * @return
+    *    A commandData object if enabled or null if not.
+    */
    public CommandData getSlashCommand(){
       if(isAllowSlashCommand()){
-         return Commands.slash(getCommandName(),slashHelp);
+         return Objects.requireNonNullElseGet(slashCommand, () -> Commands.slash(getCommandName(), slashHelp));
       }
       return null;
    }

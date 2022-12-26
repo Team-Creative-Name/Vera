@@ -14,6 +14,7 @@ public class DiscordTestBot {
         CommandHandler veraHandler = new CommandHandler.CommandHandlerBuilder()
                 .addOwner(Secrets.ownerID)
                 .addCommand(new CommandTest())
+                .changePrefix("!")
                 .build();
 
         discordBot.addEventListener(veraHandler);
