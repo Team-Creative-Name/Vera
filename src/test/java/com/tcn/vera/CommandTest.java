@@ -29,8 +29,6 @@ package com.tcn.vera;
 
 import com.tcn.vera.commands.CommandTemplate;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -38,22 +36,17 @@ public class CommandTest extends CommandTemplate {
 
     public CommandTest(){
         this.aliases = new String[]{"one", "two", "three"};
-        this.allowChatCommand = true;
-        this.allowSlashCommand = true;
-        this.commandName = "CommandTest";
-        this.isOwnerCommand = true;
-        this.chatHelp = "This command does a thing";
-        this.slashHelp = "This command does something slightly differently";
+        this.commandName = "commandtest";
     }
 
 
     @Override
     public void executeChatCommand(MessageReceivedEvent event, Message message, String content) {
-
+        event.getMessage().reply("Yes, a command exists!").queue();
     }
 
     @Override
     public void executeSlashCommand(SlashCommandInteractionEvent event) {
-
+        event.reply("YES! slash commands seem to work!").queue();
     }
 }

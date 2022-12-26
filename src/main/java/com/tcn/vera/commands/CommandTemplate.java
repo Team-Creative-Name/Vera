@@ -32,6 +32,8 @@ import gnu.trove.set.TLongSet;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,5 +150,12 @@ public abstract class CommandTemplate {
       ArrayList<String> array = new ArrayList<>(Arrays.asList(getAliases()));
       array.add(getCommandName());
       return array;
+   }
+
+   public CommandData getSlashCommand(){
+      if(isAllowSlashCommand()){
+         return Commands.slash(getCommandName(),slashHelp);
+      }
+      return null;
    }
 }

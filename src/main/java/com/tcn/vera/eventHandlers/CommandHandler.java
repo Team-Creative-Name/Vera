@@ -29,14 +29,18 @@ package com.tcn.vera.eventHandlers;
 
 import com.tcn.vera.commands.CommandTemplate;
 import com.tcn.vera.utils.VeraUtils;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -66,12 +70,7 @@ public class CommandHandler extends ListenerAdapter {
             registerChatCommand(command);
             registerSlashCommand(command);
         }
-
         logger.info("Registered " + chatCommandSet.size() + " chat commands.");
-        logger.info("Registered" + slashCommandSet.size() + " slash commands");
-
-        //TODO: Find a good way to actually *register* the slash commands with JDA
-
     }
 
     private void registerChatCommand(CommandTemplate toRegister){
@@ -120,6 +119,16 @@ public class CommandHandler extends ListenerAdapter {
         }
     }
 
+    @Override
+    public void onReady(@NotNull ReadyEvent event) {
+        List<CommandData> slashCommandList = new ArrayList<>();
+        for (CommandTemplate command : slashCommandSet){
+            slashCommandList.add(command.getSlashCommand());
+        }
+        event.getJDA().updateCommands().addCommands(slashCommandList).queue();
+        logger.info("Registered" + slashCommandSet.size() + " slash commands");
+    }
+
     private void executeChatCommand(CommandTemplate template, MessageReceivedEvent event, String messageContent){
         this.commandPool.submit(() ->{
             try{
@@ -151,7 +160,7 @@ public class CommandHandler extends ListenerAdapter {
 
 
     public static class CommandHandlerBuilder{
-        private ArrayList<CommandTemplate> commandList;
+        private ArrayList<CommandTemplate> commandList = new ArrayList<>();
         private String[] botOwner = new String[0];
         private String prefix = "!";
 
