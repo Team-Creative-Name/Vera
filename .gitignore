@@ -244,3 +244,5 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,gradle,windows,macos,linux
 
 .idea/discord.xml
+
+src/test/java/com/tcn/vera/Secrets.java
