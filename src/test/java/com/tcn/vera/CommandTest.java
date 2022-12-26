@@ -36,21 +36,24 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CommandTest extends CommandTemplate {
 
-    CommandTest(){
-        super("haha", "help me");
+    public CommandTest(){
+        this.aliases = new String[]{"one", "two", "three"};
+        this.allowChatCommand = true;
+        this.allowSlashCommand = true;
+        this.commandName = "CommandTest";
+        this.isOwnerCommand = true;
+        this.chatHelp = "This command does a thing";
+        this.slashHelp = "This command does something slightly differently";
     }
 
 
     @Override
-    protected void executeTextCommand(User author, TextChannel channel, Message message, String content, MessageReceivedEvent event) {
+    public void executeChatCommand(MessageReceivedEvent event, Message message, String content) {
 
     }
 
     @Override
-    protected void executeSlashCommand(SlashCommandInteractionEvent event) {
+    public void executeSlashCommand(SlashCommandInteractionEvent event) {
 
     }
-
-
-
 }

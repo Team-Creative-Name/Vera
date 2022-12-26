@@ -27,13 +27,18 @@
  */
 package com.tcn.vera;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class VeraCommandTest {
-    @Test void VeraWorksTest(){
-        VeraCommand veraCommand = new VeraCommand();
-        assertTrue(veraCommand.thisWork());
+
+
+    @Test void botCreation(){
+       JDA bot = JDABuilder.createDefault("testString").build();
+       bot.addEventListener();
+
     }
 }
