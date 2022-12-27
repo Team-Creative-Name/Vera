@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,10 +59,13 @@ public class CommandHandler extends ListenerAdapter {
     private final Logger logger;
 
     //bot specific information
-    private final String[] botOwner;
+    private String[] botOwner;
     private final String prefix;
 
-    private CommandHandler(ArrayList<CommandTemplate> commandList, String[] botOwner, String prefix){
+    /**
+     * To create an instance of this class, please use the {@link CommandHandlerBuilder}.
+     */
+    CommandHandler(ArrayList<CommandTemplate> commandList, String[] botOwner, String prefix){
         logger = LoggerFactory.getLogger("Vera: Command Handler");
         this.botOwner = botOwner;
         this.prefix = prefix;
@@ -82,7 +86,7 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     private void registerSlashCommand(CommandTemplate toRegister){
-        if(toRegister.isAllowSlashCommand()){
+        if(toRegister.isAllowSlashCommand() && (null != toRegister.getSlashCommand())){
             if(this.slashCommandSet.stream().map(CommandTemplate::getCommandName).noneMatch(c -> toRegister.getCommandName().equalsIgnoreCase(c))){
                 this.slashCommandSet.add(toRegister);
             }
@@ -99,10 +103,21 @@ public class CommandHandler extends ListenerAdapter {
                     p -> p.getAllCommandNames().contains(commandName)
             ).findFirst().orElse(null);
 
-
             if(null != command){
-                logger.debug(event.getAuthor().getName() + " has used the \"" + command.getCommandName() + "\" chat command");
-                executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
+                if(command.isOwnerCommand()){
+                    System.out.println("Author ID = " + event.getAuthor().getId());
+                    if(Arrays.stream(botOwner).anyMatch(c -> c.equalsIgnoreCase(event.getAuthor().getId()))) {
+                        logger.debug(event.getAuthor().getName() + " has used the \"" + command.getCommandName() + "\" chat command");
+                        executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
+                    }else{
+                        logger.warn(event.getAuthor().getName() + " has attempted to use the \"" + command.getCommandName()
+                                + "\" owner chat command without being on the list of owners!");
+                    }
+
+                }else{
+                    logger.debug(event.getAuthor().getName() + " has used the \"" + command.getCommandName() + "\" chat command");
+                    executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
+                }
             }
         }
     }
@@ -129,6 +144,12 @@ public class CommandHandler extends ListenerAdapter {
         }
         event.getJDA().updateCommands().addCommands(slashCommandList).queue();
         logger.info("Registered " + slashCommandSet.size() + " slash commands");
+
+        //we should also check to ensure that there is an owner set. If not, we should be able to get it from JDA
+        if(null == botOwner || botOwner.length < 1){
+            event.getJDA().retrieveApplicationInfo().onSuccess(c -> botOwner = new String[] {c.getOwner().getId()}).submit();
+            logger.warn("No owner IDs were given. New owner ID: " + botOwner[0]);
+        }
     }
 
     private void executeChatCommand(CommandTemplate template, MessageReceivedEvent event, String messageContent){
@@ -158,105 +179,4 @@ public class CommandHandler extends ListenerAdapter {
             }
         });
     }
-
-
-
-    public static class CommandHandlerBuilder{
-        private ArrayList<CommandTemplate> commandList = new ArrayList<>();
-        private String[] botOwner = new String[0];
-        private String prefix = "!";
-
-        public CommandHandler build(){
-            runChecks();
-            return new CommandHandler(commandList, botOwner, prefix);
-        }
-
-        private void runChecks(){
-
-            if(commandList.isEmpty()){
-                throw new IllegalArgumentException("Cannot build CommandHandler without any commands! Please ensure that there " +
-                        "is at least one command added via the CommandHandlerBuilder.addCommand method!");
-            }
-
-            if(prefix.length() > 1 || prefix.equalsIgnoreCase(" ")){
-                throw new IllegalArgumentException("The prefix cannot be longer than one character and cannot be a black space." +
-                        "Please modify the prefix given to the changePrefix method.");
-            }
-
-            for (CommandTemplate command : commandList){
-
-                //ensure that there is at least one type of command enabled
-                if(!command.isAllowChatCommand() && !command.isAllowSlashCommand()){
-                    throw new IllegalArgumentException("The command \"" + command.getCommandName() + "\" must have either " +
-                            "a slash command or a chat command enabled in order to be registered. Please set one of the " +
-                            "booleans to \"true\" in the command's constructor.");
-                }
-
-                //ensure that there is not a space in the command name
-                if(command.getCommandName().contains(" ")){
-                    throw new IllegalArgumentException("The command \"" + command.getCommandName() + "\" must not contain " +
-                            "any spaces in its name. Please change the commandName string in the command's constructor.");
-                }
-            }
-
-        }
-
-        /**
-         * Adds a command to be registered to the command handler. Can be called multiple times to add more commands.
-         * @param newCommand
-         *  The command object that you wish to be handled by the command handler.
-         * @return
-         *  This builder.
-         */
-        public CommandHandlerBuilder addCommand(CommandTemplate newCommand){
-            commandList.add(newCommand);
-            return this;
-        }
-
-        /**
-         * Adds a user ID that is allowed to access commands marked as owner only. This command can be called multiple
-         * times to add additional users.
-         * @param owner
-         *  The discord ID of the user you would like to add.
-         * @return
-         *  This builder
-         */
-        public CommandHandlerBuilder addOwner(String owner){
-            String[] temp = new String[botOwner.length + 1];
-            System.arraycopy(botOwner, 0, temp, 0, botOwner.length);
-            temp[botOwner.length] = owner;
-            botOwner = temp;
-            return this;
-        }
-
-        /**
-         * Adds multiple user IDs that are allowed to access commands marked as owner only. This command can be called multiple
-         * times to add additional users.
-         * @param owner
-         *  A string array of discord user IDs.
-         * @return
-         *  This builder
-         */
-        public CommandHandlerBuilder addOwner(String[] owner){
-            String[] temp = new String[botOwner.length + owner.length];
-            System.arraycopy(botOwner, 0, temp, 0, botOwner.length);
-            System.arraycopy(owner, 0, temp, botOwner.length, owner.length);
-            botOwner = temp;
-            return this;
-        }
-
-        /**
-         * Changes the bot prefix from the default '!' prefix.
-         * @param newPrefix
-         *  The prefix that you want to use. It cannot be longer than one character.
-         * @return
-         *  This builder
-         */
-        public CommandHandlerBuilder changePrefix(String newPrefix){
-            prefix = newPrefix;
-            return this;
-        }
-
-    }
-
 }

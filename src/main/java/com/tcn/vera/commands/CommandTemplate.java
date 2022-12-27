@@ -32,6 +32,7 @@ import gnu.trove.set.TLongSet;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
@@ -41,7 +42,7 @@ import java.util.Objects;
 
 /**
  * This is the command template class. Any command executed via Vera should extend this class in some fashion. This command
- * template is designed to be passed to the {@link com.tcn.vera.eventHandlers.CommandHandler.CommandHandlerBuilder} and executed
+ * template is designed to be passed to the {@link com.tcn.vera.eventHandlers.CommandHandlerBuilder} and executed
  * via the {@link com.tcn.vera.eventHandlers.CommandHandler} object build by said builder.
  * <br><br>
  * The constructor of this class is responsible for setting many of the command's properties. An example is as follows:
@@ -88,7 +89,10 @@ public abstract class CommandTemplate {
 
    /**
     * This boolean sets if the command should be usable to only the owner(s) of the bot. If no owner is set, it will default
-    * to owner or organization in the discord developer portal.
+    * to owner or organization in the discord developer portal. <br><br>
+    * Please note that this only works with chat commands. If you wish to set permissions on a slash command, you must use
+    * the {@link net.dv8tion.jda.api.interactions.commands.build.SlashCommandData#setDefaultPermissions(DefaultMemberPermissions)}
+    * method when building your slash command.
     */
    protected boolean isOwnerCommand = false;
 
@@ -173,5 +177,9 @@ public abstract class CommandTemplate {
          return Objects.requireNonNullElseGet(slashCommand, () -> Commands.slash(getCommandName(), slashHelp));
       }
       return null;
+   }
+
+   public boolean isOwnerCommand(){
+      return isOwnerCommand;
    }
 }

@@ -31,6 +31,7 @@ import com.tcn.vera.commands.CommandTemplate;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
@@ -39,8 +40,9 @@ public class CommandTest extends CommandTemplate {
     public CommandTest(){
         this.aliases = new String[]{"one", "two", "three"};
         this.commandName = "commandtest";
+        this.isOwnerCommand = true;
         this.slashCommand = Commands.slash(getCommandName(), "a slash command example")
-                .addOption(OptionType.INTEGER, "number", "a random numer", true);
+                .addOption(OptionType.INTEGER, "number", "a random number", true);
     }
 
 
