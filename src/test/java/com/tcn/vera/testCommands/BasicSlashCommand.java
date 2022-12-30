@@ -25,34 +25,24 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera;
+package com.tcn.vera.testCommands;
 
-import com.tcn.vera.commands.CommandTemplate;
-import net.dv8tion.jda.api.entities.Message;
+import com.tcn.vera.commands.SlashCommandTemplate;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class CommandTest extends CommandTemplate {
+public class BasicSlashCommand extends SlashCommandTemplate {
 
-    public CommandTest(){
-        this.aliases = new String[]{"one", "two", "three"};
-        this.commandName = "commandtest";
-        this.isOwnerCommand = true;
-        this.slashCommand = Commands.slash(getCommandName(), "a slash command example")
-                .addOption(OptionType.INTEGER, "number", "a random number", true);
-    }
-
-
-    @Override
-    public void executeChatCommand(MessageReceivedEvent event, Message message, String content) {
-        event.getMessage().reply("Yes, a command exists!").queue();
+    public BasicSlashCommand(){
+        this.commandName = "basicslashtest";
+        this.help = "test the basic ability to create and respond to a slash command";
+        this.slashCommand = Commands.slash(getCommandName(), getCommandHelp());
     }
 
     @Override
     public void executeSlashCommand(SlashCommandInteractionEvent event) {
-        event.reply("YES! slash commands seem to work!").queue();
+        event.reply("I am responding to your slash command!").queue();
     }
+
+
 }

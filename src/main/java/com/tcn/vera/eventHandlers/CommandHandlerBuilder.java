@@ -27,13 +27,14 @@
  */
 package com.tcn.vera.eventHandlers;
 
-import com.tcn.vera.commands.CommandTemplate;
+import com.tcn.vera.commands.CommandTemplateBase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CommandHandlerBuilder{
-    private ArrayList<CommandTemplate> commandList = new ArrayList<>();
-    private String[] botOwner = new String[0];
+    private final ArrayList<CommandTemplateBase> commandList = new ArrayList<>();
+    private final ArrayList<String> botOwner = new ArrayList<>();
     private String prefix = "!";
 
     public CommandHandler build(){
@@ -53,15 +54,7 @@ public class CommandHandlerBuilder{
                     "Please modify the prefix given to the changePrefix method.");
         }
 
-        for (CommandTemplate command : commandList){
-
-            //ensure that there is at least one type of command enabled
-            if(!command.isAllowChatCommand() && !command.isAllowSlashCommand()){
-                throw new IllegalArgumentException("The command \"" + command.getCommandName() + "\" must have either " +
-                        "a slash command or a chat command enabled in order to be registered. Please set one of the " +
-                        "booleans to \"true\" in the command's constructor.");
-            }
-
+        for (CommandTemplateBase command : commandList){
             //ensure that there is not a space in the command name
             if(command.getCommandName().contains(" ")){
                 throw new IllegalArgumentException("The command \"" + command.getCommandName() + "\" must not contain " +
@@ -78,7 +71,7 @@ public class CommandHandlerBuilder{
      * @return
      *  This builder.
      */
-    public CommandHandlerBuilder addCommand(CommandTemplate newCommand){
+    public CommandHandlerBuilder addCommand(CommandTemplateBase newCommand){
         commandList.add(newCommand);
         return this;
     }
@@ -87,15 +80,12 @@ public class CommandHandlerBuilder{
      * Adds a user ID that is allowed to access commands marked as owner only. This command can be called multiple
      * times to add additional users.
      * @param owner
-     *  The discord ID of the user you would like to add.
+     *  A string representing the discord ID of the user you would like to add.
      * @return
      *  This builder
      */
     public CommandHandlerBuilder addOwner(String owner){
-        String[] temp = new String[botOwner.length + 1];
-        System.arraycopy(botOwner, 0, temp, 0, botOwner.length);
-        temp[botOwner.length] = owner;
-        botOwner = temp;
+        botOwner.add(owner);
         return this;
     }
 
@@ -108,10 +98,7 @@ public class CommandHandlerBuilder{
      *  This builder
      */
     public CommandHandlerBuilder addOwner(String[] owner){
-        String[] temp = new String[botOwner.length + owner.length];
-        System.arraycopy(botOwner, 0, temp, 0, botOwner.length);
-        System.arraycopy(owner, 0, temp, botOwner.length, owner.length);
-        botOwner = temp;
+        botOwner.addAll(Arrays.stream(owner).toList());
         return this;
     }
 

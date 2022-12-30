@@ -25,18 +25,22 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera;
+package com.tcn.vera.testCommands;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import org.junit.jupiter.api.Test;
+import com.tcn.vera.commands.MessageContextTemplate;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-class VeraCommandTest {
-
-
-    @Test void botCreation(){
-       JDA bot = JDABuilder.createDefault("testString").build();
-       bot.addEventListener();
+public class BasicMessageContextCommand extends MessageContextTemplate {
+    public BasicMessageContextCommand(){
+        this.commandName = "Message Context Example";
+        this.help = "This is an example message context command";
+        this.messageContextCommand = Commands.context(Command.Type.MESSAGE, getCommandName());
+    }
+    @Override
+    public void executeMessageContextCommand(MessageContextInteractionEvent event) {
+        event.reply("Wow, this works too!").queue();
 
     }
 }

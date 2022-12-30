@@ -25,18 +25,20 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera;
+package com.tcn.vera.testCommands;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import org.junit.jupiter.api.Test;
+import com.tcn.vera.commands.UserContextTemplate;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 
-class VeraCommandTest {
+public class BasicUserContextCommand extends UserContextTemplate {
 
+    public BasicUserContextCommand(){
+        this.commandName = "usercontextcommandexample";
 
-    @Test void botCreation(){
-       JDA bot = JDABuilder.createDefault("testString").build();
-       bot.addEventListener();
+    }
 
+    @Override
+    public void executeUserContextCommand(UserContextInteractionEvent event) {
+        event.reply("This is an example response for the User Context command!").queue();
     }
 }

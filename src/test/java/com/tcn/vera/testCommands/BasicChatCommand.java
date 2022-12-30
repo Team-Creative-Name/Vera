@@ -25,18 +25,22 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera;
+package com.tcn.vera.testCommands;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import org.junit.jupiter.api.Test;
+import com.tcn.vera.commands.ChatCommandTemplate;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-class VeraCommandTest {
+public class BasicChatCommand extends ChatCommandTemplate {
 
-
-    @Test void botCreation(){
-       JDA bot = JDABuilder.createDefault("testString").build();
-       bot.addEventListener();
-
+    public BasicChatCommand(){
+        this.commandName = "BasicChatCommand";
+        this.aliases = new String[] {"one", "two", "three"};
+        this.help = "This command does a thing!";
+        this.isOwnerCommand = false;
+    }
+    @Override
+    public void executeChatCommand(MessageReceivedEvent event, Message message, String messageContent) {
+        message.reply("This command works!").queue();
     }
 }
