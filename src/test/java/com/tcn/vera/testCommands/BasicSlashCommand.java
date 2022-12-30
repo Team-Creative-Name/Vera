@@ -33,7 +33,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class BasicSlashCommand extends SlashCommandTemplate {
 
-    public BasicSlashCommand(){
+    public BasicSlashCommand() {
         this.commandName = "basicslashtest";
         this.help = "test the basic ability to create and respond to a slash command";
         this.slashCommand = Commands.slash(getCommandName(), getCommandHelp());

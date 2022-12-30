@@ -33,11 +33,12 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class BasicMessageContextCommand extends MessageContextTemplate {
-    public BasicMessageContextCommand(){
+    public BasicMessageContextCommand() {
         this.commandName = "Message Context Example";
         this.help = "This is an example message context command";
         this.messageContextCommand = Commands.context(Command.Type.MESSAGE, getCommandName());
     }
+
     @Override
     public void executeMessageContextCommand(MessageContextInteractionEvent event) {
         event.reply("Wow, this works too!").queue();

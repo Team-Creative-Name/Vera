@@ -73,47 +73,48 @@ public class CommandHandler extends ListenerAdapter {
     /**
      * To create an instance of this class, please use the {@link CommandHandlerBuilder}.
      */
-    CommandHandler(ArrayList<? extends CommandTemplateBase> commandList, ArrayList<String> botOwner, String prefix){
+    CommandHandler(ArrayList<? extends CommandTemplateBase> commandList, ArrayList<String> botOwner, String prefix) {
         logger = LoggerFactory.getLogger("Vera: Command Handler");
         this.botOwner = botOwner;
         this.prefix = prefix;
 
-        for(CommandTemplateBase command: commandList){
-            switch (command.getCommandType()){
+        for (CommandTemplateBase command : commandList) {
+            switch (command.getCommandType()) {
                 case CHAT_COMMAND -> {
-                    if(this.chatCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))){
+                    if (this.chatCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
                         this.chatCommandSet.add((ChatCommandTemplate) command);
-                    }else{
+                    } else {
                         throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
                                 + "\" has already been registered as a chat command. Command names must be unique, lowercase and alphanumeric");
                     }
                 }
                 case SLASH_COMMAND -> {
-                    if(this.slashCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))){
+                    if (this.slashCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
                         this.slashCommandSet.add((SlashCommandTemplate) command);
-                    }else{
+                    } else {
                         throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
                                 + "\" has already been registered as a slash command. Command names must be unique, lowercase and alphanumeric");
                     }
                 }
                 case USER_CONTEXT_COMMAND -> {
-                    if(this.userContextCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))){
+                    if (this.userContextCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
                         this.userContextCommandSet.add((UserContextTemplate) command);
-                    }else{
+                    } else {
                         throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
                                 + "\" has already been registered as a user context command. Command names must be unique, lowercase and alphanumeric");
                     }
                 }
                 case CONTEXT_MESSAGE_COMMAND -> {
-                    if(this.messageContextCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))){
+                    if (this.messageContextCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
                         this.messageContextCommandSet.add((MessageContextTemplate) command);
-                    }else{
+                    } else {
                         throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
                                 + "\" has already been registered as a message context command. Command names must be unique, lowercase and alphanumeric");
                     }
                 }
-                default -> throw new IllegalArgumentException("Sorry, this command handler is only capable of handling Chat, Slash, and Context commands. " +
-                        "If you have created your own command type, you will have to extend this class and add support for it here!");
+                default ->
+                        throw new IllegalArgumentException("Sorry, this command handler is only capable of handling Chat, Slash, and Context commands. " +
+                                "If you have created your own command type, you will have to extend this class and add support for it here!");
             }
         }
         logger.info("Registered " + chatCommandSet.size() + " chat command(s).");
@@ -124,28 +125,25 @@ public class CommandHandler extends ListenerAdapter {
 
 
     @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event){
-        if(event.getMessage().getContentRaw().toLowerCase().startsWith(prefix) && !event.getAuthor().isBot()){
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (event.getMessage().getContentRaw().toLowerCase().startsWith(prefix) && !event.getAuthor().isBot()) {
             String rawMessage = event.getMessage().getContentRaw();
             String commandName = VeraUtils.getCommandName(rawMessage);
 
             ChatCommandTemplate command = chatCommandSet.stream().filter(
-                   p -> p.getAllCommandNames().contains(commandName)
+                    p -> p.getAllCommandNames().contains(commandName)
             ).findFirst().orElse(null);
 
-            if(null != command){
-                if(command.isOwnerCommand()){
-                    System.out.println("Author ID = " + event.getAuthor().getId());
-
-                    if(botOwner.stream().anyMatch(c -> c.equalsIgnoreCase(event.getAuthor().getId()))) {
+            if (null != command) {
+                if (command.isOwnerCommand()) {
+                    if (botOwner.stream().anyMatch(c -> c.equalsIgnoreCase(event.getAuthor().getId()))) {
                         logger.debug(event.getAuthor().getName() + " has used the \"" + command.getCommandName() + "\" chat command");
                         executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
-                    }else{
+                    } else {
                         logger.warn(event.getAuthor().getName() + " has attempted to use the \"" + command.getCommandName()
                                 + "\" owner chat command without being on the list of owners!");
                     }
-
-                }else{
+                } else {
                     logger.debug(event.getAuthor().getName() + " has used the \"" + command.getCommandName() + "\" chat command");
                     executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
                 }
@@ -161,7 +159,7 @@ public class CommandHandler extends ListenerAdapter {
                 p -> p.getSlashCommand().getName().equalsIgnoreCase(event.getFullCommandName())
         ).findFirst().orElse(null);
 
-        if(null != command){
+        if (null != command) {
             logger.debug(event.getUser().getName() + " has used the \"" + command.getCommandName() + "\" slash command");
             executeSlashCommand(command, event);
         }
@@ -169,42 +167,49 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event){
+    public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
         //TODO: implement this
     }
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event){
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         //TODO: implement this
     }
 
-    public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event){
-        //TODO: implement this
-    }
-    public void onEntitySelectInteraction(@Nonnull EntitySelectInteractionEvent event){
+    @Override
+    public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         //TODO: implement this
     }
 
+    @Override
+    public void onEntitySelectInteraction(@Nonnull EntitySelectInteractionEvent event) {
+        //TODO: implement this
+    }
+
+    @Override
     public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
         //TODO: implement this
     }
 
+    @Override
     public void onUserContextInteraction(@Nonnull UserContextInteractionEvent event) {
         UserContextTemplate command = userContextCommandSet.stream().filter(
                 p -> p.getUserContextCommand().getName().equalsIgnoreCase(event.getFullCommandName())
         ).findFirst().orElse(null);
 
-        if(null != command){
+        if (null != command) {
             logger.debug(event.getUser().getName() + " has used the \"" + command.getCommandName() + "\" slash command");
             executeUserContextCommand(command, event);
         }
     }
+
+    @Override
     public void onMessageContextInteraction(@Nonnull MessageContextInteractionEvent event) {
         MessageContextTemplate command = messageContextCommandSet.stream().filter(
                 p -> p.getMessageContextCommand().getName().equalsIgnoreCase(event.getFullCommandName())
         ).findFirst().orElse(null);
 
-        if(null != command){
+        if (null != command) {
             logger.debug(event.getUser().getName() + " has used the \"" + command.getCommandName() + "\" slash command");
             executeMessageContextCommand(command, event);
         }
@@ -224,18 +229,19 @@ public class CommandHandler extends ListenerAdapter {
                 userContextCommandSet.size() + " user context command(s), and " +
                 messageContextCommandSet.size() + " message context command(s) to Discord.");
 
+
         //we should also check to ensure that there is an owner set. If not, we should be able to get it from JDA
-        if(null == botOwner || botOwner.size() < 1){
+        if (null == botOwner || botOwner.isEmpty()) {
             event.getJDA().retrieveApplicationInfo().onSuccess(c -> botOwner.add(c.getOwner().getId())).submit();
             logger.warn("No owner IDs were given. New owner ID: " + botOwner.get(0));
         }
     }
 
-    private void executeChatCommand(ChatCommandTemplate template, MessageReceivedEvent event, String messageContent){
-        this.commandPool.submit(() ->{
-            try{
+    private void executeChatCommand(ChatCommandTemplate template, MessageReceivedEvent event, String messageContent) {
+        this.commandPool.submit(() -> {
+            try {
                 template.executeChatCommand(event, event.getMessage(), messageContent);
-            }catch (final Exception e){
+            } catch (final Exception e) {
                 logger.error("Error while executing the \"" + template.getCommandName() + "\" chat command! \n" +
                         "Exception: " + e.getLocalizedMessage());
                 event.getMessage().reply("Sorry, I was unable to finish executing that command. Please try again later.").queue();
@@ -243,34 +249,34 @@ public class CommandHandler extends ListenerAdapter {
         });
     }
 
-    private void executeSlashCommand(SlashCommandTemplate template, SlashCommandInteractionEvent event){
-        this.commandPool.submit(() ->{
-            try{
+    private void executeSlashCommand(SlashCommandTemplate template, SlashCommandInteractionEvent event) {
+        this.commandPool.submit(() -> {
+            try {
                 template.executeSlashCommand(event);
-            }catch (final Exception e){
+            } catch (final Exception e) {
                 logger.error("Error while executing the \"" + template.getCommandName() + "\" slash command! \n" +
                         "Exception: " + e.getLocalizedMessage());
-                if(event.isAcknowledged()){
+                if (event.isAcknowledged()) {
                     event.getHook().editOriginal("Sorry, I was unable to finish executing that command. Please try again later.").setActionRow().setEmbeds().queue();
-                }else{
+                } else {
                     event.reply("Sorry, I was unable to finish executing that command. Please try again later.").setEphemeral(true).queue();
                 }
             }
         });
     }
 
-    private void executeUserContextCommand(UserContextTemplate template, UserContextInteractionEvent event){
-        try{
+    private void executeUserContextCommand(UserContextTemplate template, UserContextInteractionEvent event) {
+        try {
             template.executeUserContextCommand(event);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("I was made by someone who was too lazy to handle this correctly!");
         }
     }
 
-    private void executeMessageContextCommand(MessageContextTemplate template, MessageContextInteractionEvent event){
-        try{
+    private void executeMessageContextCommand(MessageContextTemplate template, MessageContextInteractionEvent event) {
+        try {
             template.executeMessageContextCommand(event);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("I was made by someone who was too lazy to handle this correctly!");
         }
     }

@@ -44,13 +44,8 @@ public abstract class CommandTemplateBase {
      * that the command supports.
      */
     protected final CommandType commandType;
-
-    public CommandTemplateBase(CommandType type){
-        this.commandType = type;
-    }
-
     /**
-     *The name of the command. Unless overridden, this is what the command template will use as the invocation method for
+     * The name of the command. Unless overridden, this is what the command template will use as the invocation method for
      * your command.
      * <p>
      * Depending on the type of command, the name has a few requirements:
@@ -63,7 +58,6 @@ public abstract class CommandTemplateBase {
      * the <a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object">Discord docs on Application Command Naming</a>
      */
     protected String commandName = "command";
-
     /**
      * This string is used as the general description of the command. If this command is something that discord shows a description
      * near such as a context or slash command, it will appear there if you use the default command builder. This string is also presented
@@ -71,11 +65,15 @@ public abstract class CommandTemplateBase {
      */
     protected String help = "No help provided for this command!";
 
-    public String getCommandName(){
+    protected CommandTemplateBase(CommandType type) {
+        this.commandType = type;
+    }
+
+    public String getCommandName() {
         return commandName;
     }
 
-    public String getCommandHelp(){
+    public String getCommandHelp() {
         return help;
     }
 

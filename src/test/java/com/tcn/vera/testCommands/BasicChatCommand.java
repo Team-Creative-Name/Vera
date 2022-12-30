@@ -33,12 +33,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class BasicChatCommand extends ChatCommandTemplate {
 
-    public BasicChatCommand(){
+    public BasicChatCommand() {
         this.commandName = "BasicChatCommand";
-        this.aliases = new String[] {"one", "two", "three"};
+        this.aliases = new String[]{"one", "two", "three"};
         this.help = "This command does a thing!";
         this.isOwnerCommand = false;
     }
+
     @Override
     public void executeChatCommand(MessageReceivedEvent event, Message message, String messageContent) {
         message.reply("This command works!").queue();

@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is the chat command template class. Any command executed by typing the bot prefix followed by a command name should
@@ -69,9 +70,8 @@ import java.util.Arrays;
  *
  * @author Thomas Wessel
  * @since 1.0
- *
  */
-public abstract class ChatCommandTemplate extends CommandTemplateBase{
+public abstract class ChatCommandTemplate extends CommandTemplateBase {
 
     /**
      * Any additional names that you might want a command to go by. For example, a help command might also be invoked by
@@ -94,41 +94,39 @@ public abstract class ChatCommandTemplate extends CommandTemplateBase{
     protected boolean isOwnerCommand = false;
 
 
-    public ChatCommandTemplate() {
+    protected ChatCommandTemplate() {
         super(CommandType.CHAT_COMMAND);
     }
 
     /**
      * The entrypoint into your command.
-     * @param event
-     *      The {@link MessageReceivedEvent} which caused the command to be called.
-     * @param message
-     *      The {@link Message} that fired the event.
-     * @param messageContent
-     *      The message content with the prefix and command name stripped out.
+     *
+     * @param event          The {@link MessageReceivedEvent} which caused the command to be called.
+     * @param message        The {@link Message} that fired the event.
+     * @param messageContent The message content with the prefix and command name stripped out.
      */
     public abstract void executeChatCommand(MessageReceivedEvent event, Message message, String messageContent);
 
     /**
      * Gets the type of command. This value is hardcoded into the commandTemplate and cannot be changed. This value can
      * be used to determine the type of command.
-     * @return
-     *     A {@link CommandType} that identifies the type of command that this class represents.
+     *
+     * @return A {@link CommandType} that identifies the type of command that this class represents.
      */
     @Override
     public CommandType getCommandType() {
         return commandType;
     }
 
-    public boolean isOwnerCommand(){
+    public boolean isOwnerCommand() {
         return isOwnerCommand;
     }
 
-    public String[] getAliases(){
+    public String[] getAliases() {
         return aliases;
     }
 
-    public ArrayList<String> getAllCommandNames(){
+    public List<String> getAllCommandNames() {
         ArrayList<String> array = new ArrayList<>(Arrays.asList(getAliases()));
         array.add(getCommandName());
         return array;

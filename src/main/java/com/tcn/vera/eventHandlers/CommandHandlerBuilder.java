@@ -27,51 +27,52 @@
  */
 package com.tcn.vera.eventHandlers;
 
+import com.tcn.vera.commands.ChatCommandTemplate;
 import com.tcn.vera.commands.CommandTemplateBase;
+import com.tcn.vera.commands.CommandType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class CommandHandlerBuilder{
+public class CommandHandlerBuilder {
     private final ArrayList<CommandTemplateBase> commandList = new ArrayList<>();
     private final ArrayList<String> botOwner = new ArrayList<>();
     private String prefix = "!";
 
-    public CommandHandler build(){
+    public CommandHandler build() {
         runChecks();
         return new CommandHandler(commandList, botOwner, prefix);
     }
 
-    private void runChecks(){
+    private void runChecks() {
 
-        if(commandList.isEmpty()){
+        if (commandList.isEmpty()) {
             throw new IllegalArgumentException("Cannot build CommandHandler without any commands! Please ensure that there " +
                     "is at least one command added via the CommandHandlerBuilder.addCommand method!");
         }
 
-        if(prefix.length() > 1 || prefix.equalsIgnoreCase(" ")){
-            throw new IllegalArgumentException("The prefix cannot be longer than one character and cannot be a black space." +
-                    "Please modify the prefix given to the changePrefix method.");
+        if (prefix.length() > 1 || prefix.equalsIgnoreCase(" ")) {
+            throw new IllegalArgumentException("The prefix cannot be longer than one character and cannot be a blank space." +
+                    "Please modify the prefix given to the changePrefix method. This commandhandler will not be built");
         }
 
-        for (CommandTemplateBase command : commandList){
-            //ensure that there is not a space in the command name
-            if(command.getCommandName().contains(" ")){
-                throw new IllegalArgumentException("The command \"" + command.getCommandName() + "\" must not contain " +
-                        "any spaces in its name. Please change the commandName string in the command's constructor.");
+        for (CommandTemplateBase command : commandList) {
+            if (command.getCommandType() == CommandType.CHAT_COMMAND) {
+                ChatCommandTemplate tempCommand = (ChatCommandTemplate) command;
+                if (tempCommand.getAllCommandNames().stream().anyMatch(c -> c.contains(" "))) {
+                    throw new IllegalArgumentException("Sorry, chat commands cannot have a space in their name or aliases");
+                }
             }
         }
-
     }
 
     /**
      * Adds a command to be registered to the command handler. Can be called multiple times to add more commands.
-     * @param newCommand
-     *  The command object that you wish to be handled by the command handler.
-     * @return
-     *  This builder.
+     *
+     * @param newCommand The command object that you wish to be handled by the command handler.
+     * @return This builder.
      */
-    public CommandHandlerBuilder addCommand(CommandTemplateBase newCommand){
+    public CommandHandlerBuilder addCommand(CommandTemplateBase newCommand) {
         commandList.add(newCommand);
         return this;
     }
@@ -79,12 +80,11 @@ public class CommandHandlerBuilder{
     /**
      * Adds a user ID that is allowed to access commands marked as owner only. This command can be called multiple
      * times to add additional users.
-     * @param owner
-     *  A string representing the discord ID of the user you would like to add.
-     * @return
-     *  This builder
+     *
+     * @param owner A string representing the discord ID of the user you would like to add.
+     * @return This builder
      */
-    public CommandHandlerBuilder addOwner(String owner){
+    public CommandHandlerBuilder addOwner(String owner) {
         botOwner.add(owner);
         return this;
     }
@@ -92,24 +92,22 @@ public class CommandHandlerBuilder{
     /**
      * Adds multiple user IDs that are allowed to access commands marked as owner only. This command can be called multiple
      * times to add additional users.
-     * @param owner
-     *  A string array of discord user IDs.
-     * @return
-     *  This builder
+     *
+     * @param owner A string array of discord user IDs.
+     * @return This builder
      */
-    public CommandHandlerBuilder addOwner(String[] owner){
+    public CommandHandlerBuilder addOwner(String[] owner) {
         botOwner.addAll(Arrays.stream(owner).toList());
         return this;
     }
 
     /**
      * Changes the bot prefix from the default '!' prefix.
-     * @param newPrefix
-     *  The prefix that you want to use. It cannot be longer than one character.
-     * @return
-     *  This builder
+     *
+     * @param newPrefix The prefix that you want to use. It cannot be longer than one character.
+     * @return This builder
      */
-    public CommandHandlerBuilder changePrefix(String newPrefix){
+    public CommandHandlerBuilder changePrefix(String newPrefix) {
         prefix = newPrefix;
         return this;
     }

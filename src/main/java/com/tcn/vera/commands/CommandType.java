@@ -66,27 +66,23 @@ public enum CommandType {
     CONTEXT_MESSAGE_COMMAND(4),
     ;
 
-    private final int commandType;
+    private final int thisCommandType;
 
-    CommandType(int commandType)
-    {
-        this.commandType = commandType;
+    CommandType(int thisCommandType) {
+        this.thisCommandType = thisCommandType;
     }
 
     /**
      * gets the type of command based upon its integer value.
-     * @param key
-     *  The integer value that the command type represents.
-     * @return
-     *  The CommandType that your key represents. If there is no match, then it returns the {@link CommandType#UNKNOWN} type
-     *  which is mapped to the key of value -1.
+     *
+     * @param key The integer value that the command type represents.
+     * @return The CommandType that your key represents. If there is no match, then it returns the {@link CommandType#UNKNOWN} type
+     * which is mapped to the key of value -1.
      */
     @Nonnull
-    public static CommandType fromKey(int key)
-    {
-        for (CommandType type : values())
-        {
-            if (type.commandType == key)
+    public static CommandType fromKey(int key) {
+        for (CommandType type : values()) {
+            if (type.thisCommandType == key)
                 return type;
         }
         return UNKNOWN;

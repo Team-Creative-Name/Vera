@@ -32,7 +32,7 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 
 public class BasicUserContextCommand extends UserContextTemplate {
 
-    public BasicUserContextCommand(){
+    public BasicUserContextCommand() {
         this.commandName = "usercontextcommandexample";
 
     }

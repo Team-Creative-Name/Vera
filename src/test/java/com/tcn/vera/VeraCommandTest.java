@@ -34,9 +34,10 @@ import org.junit.jupiter.api.Test;
 class VeraCommandTest {
 
 
-    @Test void botCreation(){
-       JDA bot = JDABuilder.createDefault("testString").build();
-       bot.addEventListener();
+    @Test
+    void botCreation() {
+        JDA bot = JDABuilder.createDefault("testString").build();
+        bot.addEventListener();
 
     }
 }

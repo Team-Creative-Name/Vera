@@ -37,7 +37,7 @@ import java.util.Objects;
  * This is the slash command template. Any command that can be executed via typing a forward slash in chat should
  * extend this class. Please note that discord imposes a limit of a total of 100 slash commands per bot. This
  * is not something that can be changed.
- *<p>
+ * <p>
  * Once you have built a command based upon this class, you simply need to pass it to an instance of the Vera {@link com.tcn.vera.eventHandlers.CommandHandlerBuilder}
  * and then add that as an event listener in the {@link net.dv8tion.jda.api.JDABuilder}. For example:
  * <blockquote><pre>
@@ -70,7 +70,7 @@ import java.util.Objects;
  * @author Thomas Wessel
  * @since 1.0
  */
-public abstract class SlashCommandTemplate extends CommandTemplateBase{
+public abstract class SlashCommandTemplate extends CommandTemplateBase {
 
     /**
      * The {@link CommandData} object that will be sent to discord. This will be automatically generated if one is not
@@ -78,14 +78,14 @@ public abstract class SlashCommandTemplate extends CommandTemplateBase{
      */
     protected CommandData slashCommand = null;
 
-    public SlashCommandTemplate() {
+    protected SlashCommandTemplate() {
         super(CommandType.SLASH_COMMAND);
     }
 
     /**
      * The entrypoint into your command.
-     * @param event
-     *      The {@link SlashCommandInteractionEvent} which caused the command to be executed.
+     *
+     * @param event The {@link SlashCommandInteractionEvent} which caused the command to be executed.
      */
     public abstract void executeSlashCommand(SlashCommandInteractionEvent event);
 
@@ -93,14 +93,13 @@ public abstract class SlashCommandTemplate extends CommandTemplateBase{
      * Gets a {@link CommandData} object that represents the data to be sent to Discord. If there was not one set in the constructor,
      * this method generates one based upon the command name and help strings.
      *
-     * @return
-     *      A {@link CommandData object representing the data to be sent to Discord}
+     * @return A {@link CommandData object representing the data to be sent to Discord}
      */
-    public CommandData getSlashCommand(){
+    public CommandData getSlashCommand() {
         return Objects.requireNonNullElseGet(slashCommand, () -> Commands.slash(getCommandName(), getCommandHelp()));
     }
 
-    public CommandType getCommandType(){
+    public CommandType getCommandType() {
         return commandType;
     }
 

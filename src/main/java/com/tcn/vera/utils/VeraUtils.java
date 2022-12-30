@@ -37,9 +37,13 @@ import java.util.concurrent.ThreadFactory;
  */
 public class VeraUtils {
 
-    public static ThreadFactory createThreadFactory(String threadName, Logger logger, boolean isDaemon){
+    private VeraUtils() {
+        throw new IllegalStateException("This is a utility class! Don't try to make a class out of it!");
+    }
 
-        return (r ->{
+    public static ThreadFactory createThreadFactory(String threadName, Logger logger, boolean isDaemon) {
+
+        return (r -> {
             Thread thread = new Thread(r, threadName);
             thread.setDaemon(isDaemon);
             thread.setUncaughtExceptionHandler((Thread errorThread, Throwable throwable) ->
@@ -63,16 +67,16 @@ public class VeraUtils {
 
     /**
      * Takes in a full command string and strips it of both the prefix and any additional command context.
-     * @return
-     *      A String containing just the first word in a string with the assumed prefix removed
+     *
+     * @return A String containing just the first word in a string with the assumed prefix removed
      */
-    public static String getCommandName(String fullCommand){
-        if(fullCommand.trim().contains(" ")){
+    public static String getCommandName(String fullCommand) {
+        if (fullCommand.trim().contains(" ")) {
             int index = fullCommand.trim().indexOf(" ");
             return fullCommand.trim().substring(1, index);
-        }else if(fullCommand.length() > 1){
+        } else if (fullCommand.length() > 1) {
             return fullCommand.trim().substring(1);
-        }else{
+        } else {
             return fullCommand.trim();
         }
     }

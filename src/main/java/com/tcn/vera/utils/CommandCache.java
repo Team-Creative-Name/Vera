@@ -32,23 +32,23 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 //This class is a modified version of the one in Almighty-Alpaca/JDA-Butler
-public class CommandCache<K, V>{
-    private final Map<K,V> map = new HashMap<>();
+public class CommandCache<K, V> {
+    private final Map<K, V> map = new HashMap<>();
 
     private final K[] keys;
 
     private int currIndex = 0;
 
     @SuppressWarnings("unchecked")
-    public CommandCache(int size){
-        if(size < 1){
+    public CommandCache(int size) {
+        if (size < 1) {
             throw new IllegalArgumentException("Cache size must be at least 1 in size!");
-        }else{
+        } else {
             this.keys = (K[]) new Object[size];
         }
     }
 
-    public V find(Predicate<K> toFind){
+    public V find(Predicate<K> toFind) {
         return map.entrySet()
                 .stream()
                 .filter(it -> toFind.test(it.getKey()))
@@ -68,7 +68,6 @@ public class CommandCache<K, V>{
 
     public void remove(K key) {
         if (!contains(key)) {
-            return;
         }
     }
 

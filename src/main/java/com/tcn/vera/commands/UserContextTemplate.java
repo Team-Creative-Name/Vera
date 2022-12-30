@@ -38,7 +38,7 @@ import java.util.Objects;
  * This is the User Context command template. Any command that can be executed via right-clicking on a user should
  * extend this class. Please note that discord imposes a limit of a total of five user context commands per bot. This
  * is not something that can be changed.
- *<p>
+ * <p>
  * Once you have built a command based upon this class, you simply need to pass it to an instance of the Vera {@link com.tcn.vera.eventHandlers.CommandHandlerBuilder}
  * and then add that as an event listener in the {@link net.dv8tion.jda.api.JDABuilder}. For example:
  * <blockquote><pre>
@@ -71,7 +71,7 @@ import java.util.Objects;
  * @author Thomas Wessel
  * @since 1.0
  */
-public abstract class UserContextTemplate extends CommandTemplateBase{
+public abstract class UserContextTemplate extends CommandTemplateBase {
 
     /**
      * The {@link CommandData} object that will be sent to discord. This will be automatically generated if one is not
@@ -79,32 +79,30 @@ public abstract class UserContextTemplate extends CommandTemplateBase{
      */
     protected CommandData userContextCommand = null;
 
-    public UserContextTemplate(){
+    protected UserContextTemplate() {
         super(CommandType.USER_CONTEXT_COMMAND);
     }
 
     /**
      * The entrypoint into your command.
-     * @param event
-     *      The {@link UserContextInteractionEvent} which caused the command to be executed.
+     *
+     * @param event The {@link UserContextInteractionEvent} which caused the command to be executed.
      */
     public abstract void executeUserContextCommand(UserContextInteractionEvent event);
 
     /**
      * Gets a {@link CommandData} object that represents the data to be sent to Discord. If there was not one set in the constructor
      * this method generates one based upon the command name.
-     * @return
-     *  A {@link CommandData} object representing the data to send to Discord.
      *
-     * @implNote
-     *  Because this command is so simple, it is best to let the template generate a command data object for you unless
-     *  you need any specific features.
+     * @return A {@link CommandData} object representing the data to send to Discord.
+     * @implNote Because this command is so simple, it is best to let the template generate a command data object for you unless
+     * you need any specific features.
      */
-    public CommandData getUserContextCommand(){
+    public CommandData getUserContextCommand() {
         return Objects.requireNonNullElseGet(userContextCommand, () -> Commands.context(Command.Type.USER, getCommandName()));
     }
 
-    public CommandType getCommandType(){
+    public CommandType getCommandType() {
         return commandType;
     }
 
