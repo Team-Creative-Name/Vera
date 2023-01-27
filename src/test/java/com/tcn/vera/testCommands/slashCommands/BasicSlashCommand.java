@@ -25,19 +25,24 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera;
+package com.tcn.vera.testCommands.slashCommands;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import org.junit.jupiter.api.Test;
+import com.tcn.vera.commands.SlashCommandTemplate;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-class VeraCommandTest {
+public class BasicSlashCommand extends SlashCommandTemplate {
 
-
-    @Test
-    void botCreation() {
-        JDA bot = JDABuilder.createDefault("testString").build();
-        bot.addEventListener();
-
+    public BasicSlashCommand() {
+        this.commandName = "basic-slash-test";
+        this.help = "test the basic ability to create and respond to a slash command";
+        this.slashCommand = Commands.slash(getCommandName(), getCommandHelp());
     }
+
+    @Override
+    public void executeSlashCommand(SlashCommandInteractionEvent event) {
+        event.reply("I am responding to your slash command!").queue();
+    }
+
+
 }

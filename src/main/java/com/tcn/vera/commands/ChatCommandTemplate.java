@@ -1,7 +1,7 @@
 /*
  * Vera - a common library for all of TCN's discord bots.
  *
- * Copyright (C) 2022 Thomas Wessel and the rest of Team Creative Name
+ * Copyright (C) 2022-23 Thomas Wessel and the rest of Team Creative Name
  *
  *
  * This library is licensed under the GNU Lesser General Public License v2.1

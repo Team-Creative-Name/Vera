@@ -1,7 +1,7 @@
 /*
  * Vera - a common library for all of TCN's discord bots.
  *
- * Copyright (C) 2022 Thomas Wessel and the rest of Team Creative Name
+ * Copyright (C) 2022-23 Thomas Wessel and the rest of Team Creative Name
  *
  *
  * This library is licensed under the GNU Lesser General Public License v2.1
@@ -25,23 +25,22 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera.testCommands;
+package com.tcn.vera.testCommands.messageContext;
 
-import com.tcn.vera.commands.ChatCommandTemplate;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import com.tcn.vera.commands.MessageContextTemplate;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class BasicChatCommand extends ChatCommandTemplate {
-
-    public BasicChatCommand() {
-        this.commandName = "BasicChatCommand";
-        this.aliases = new String[]{"one", "two", "three"};
-        this.help = "This command does a thing!";
-        this.isOwnerCommand = false;
+public class BasicMessageContextCommand extends MessageContextTemplate {
+    public BasicMessageContextCommand() {
+        this.commandName = "Message Context Example";
+        this.help = "This is an example message context command";
+        this.messageContextCommand = Commands.context(Command.Type.MESSAGE, getCommandName());
     }
 
     @Override
-    public void executeChatCommand(MessageReceivedEvent event, Message message, String messageContent) {
-        message.reply("This command works!").queue();
+    public void executeMessageContextCommand(MessageContextInteractionEvent event) {
+        event.reply("Your message said: " + event.getTarget().getContentRaw()).queue();
     }
 }

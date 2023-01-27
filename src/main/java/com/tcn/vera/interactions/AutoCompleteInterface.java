@@ -1,7 +1,7 @@
 /*
  * Vera - a common library for all of TCN's discord bots.
  *
- * Copyright (C) 2022 Thomas Wessel and the rest of Team Creative Name
+ * Copyright (C) 2023 Thomas Wessel and the rest of Team Creative Name
  *
  *
  * This library is licensed under the GNU Lesser General Public License v2.1
@@ -25,20 +25,22 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera.testCommands;
+package com.tcn.vera.interactions;
 
-import com.tcn.vera.commands.UserContextTemplate;
-import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 
-public class BasicUserContextCommand extends UserContextTemplate {
+/**
+ * This interface allows the addition of autocomplete interactions to a slash command. Because only the slash command
+ * can use autocomplete, implementing this in any class other than ones extending {@link com.tcn.vera.commands.SlashCommandTemplate}
+ * will have no effect.
+ */
+public interface AutoCompleteInterface {
 
-    public BasicUserContextCommand() {
-        this.commandName = "usercontextcommandexample";
+    /**
+     * The code executed when the user attempts to autofill a slash command.
+     *
+     * @param event The {@link CommandAutoCompleteInteractionEvent} sent by discord
+     */
+    void executeAutocomplete(CommandAutoCompleteInteractionEvent event);
 
-    }
-
-    @Override
-    public void executeUserContextCommand(UserContextInteractionEvent event) {
-        event.reply("This is an example response for the User Context command!").queue();
-    }
 }

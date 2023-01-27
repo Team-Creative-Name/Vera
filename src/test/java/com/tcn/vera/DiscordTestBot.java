@@ -29,10 +29,12 @@ package com.tcn.vera;
 
 import com.tcn.vera.eventHandlers.CommandHandler;
 import com.tcn.vera.eventHandlers.CommandHandlerBuilder;
-import com.tcn.vera.testCommands.BasicChatCommand;
-import com.tcn.vera.testCommands.BasicMessageContextCommand;
-import com.tcn.vera.testCommands.BasicSlashCommand;
-import com.tcn.vera.testCommands.BasicUserContextCommand;
+import com.tcn.vera.testCommands.chatCommands.BasicChatCommand;
+import com.tcn.vera.testCommands.messageContext.BasicMessageContextCommand;
+import com.tcn.vera.testCommands.slashCommands.*;
+import com.tcn.vera.testCommands.userContext.BasicUserContextCommand;
+import com.tcn.vera.testCommands.userContext.UserContextPing;
+import com.tcn.vera.testCommands.userContext.UserContextStringSelect;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -50,6 +52,12 @@ public class DiscordTestBot {
                 .addCommand(new BasicSlashCommand())
                 .addCommand(new BasicUserContextCommand())
                 .addCommand(new BasicMessageContextCommand())
+                .addCommand(new AutocompleteSlashCommand())
+                .addCommand(new ModalSlashCommand())
+                .addCommand(new EntitySelectSlashCommand())
+                .addCommand(new UserContextPing())
+                .addCommand(new StringSelectSlashCommand())
+                .addCommand(new UserContextStringSelect())
                 .changePrefix("!")
                 .build();
 

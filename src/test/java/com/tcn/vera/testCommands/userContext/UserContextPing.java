@@ -1,7 +1,7 @@
 /*
  * Vera - a common library for all of TCN's discord bots.
  *
- * Copyright (C) 2022 Thomas Wessel and the rest of Team Creative Name
+ * Copyright (C) 2023 Thomas Wessel and the rest of Team Creative Name
  *
  *
  * This library is licensed under the GNU Lesser General Public License v2.1
@@ -25,23 +25,20 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera.testCommands;
+package com.tcn.vera.testCommands.userContext;
 
-import com.tcn.vera.commands.MessageContextTemplate;
-import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import com.tcn.vera.commands.UserContextTemplate;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 
-public class BasicMessageContextCommand extends MessageContextTemplate {
-    public BasicMessageContextCommand() {
-        this.commandName = "Message Context Example";
-        this.help = "This is an example message context command";
-        this.messageContextCommand = Commands.context(Command.Type.MESSAGE, getCommandName());
+public class UserContextPing extends UserContextTemplate{
+
+    public UserContextPing(){
+        this.commandName = "Mention this user";
+        this.help = "Mentions the user you clicked on";
     }
-
     @Override
-    public void executeMessageContextCommand(MessageContextInteractionEvent event) {
-        event.reply("Wow, this works too!").queue();
-
+    public void executeUserContextCommand(UserContextInteractionEvent event) {
+        event.reply(event.getTargetMember().getAsMention()).queue();
+        System.out.println("test");
     }
 }

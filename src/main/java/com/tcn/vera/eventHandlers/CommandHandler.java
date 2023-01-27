@@ -1,7 +1,7 @@
 /*
  * Vera - a common library for all of TCN's discord bots.
  *
- * Copyright (C) 2022 Thomas Wessel and the rest of Team Creative Name
+ * Copyright (C) 2022-23 Thomas Wessel and the rest of Team Creative Name
  *
  *
  * This library is licensed under the GNU Lesser General Public License v2.1
@@ -28,6 +28,10 @@
 package com.tcn.vera.eventHandlers;
 
 import com.tcn.vera.commands.*;
+import com.tcn.vera.interactions.AutoCompleteInterface;
+import com.tcn.vera.interactions.EntitySelect;
+import com.tcn.vera.interactions.ModalInterface;
+import com.tcn.vera.interactions.StringSelect;
 import com.tcn.vera.utils.VeraUtils;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -78,6 +82,7 @@ public class CommandHandler extends ListenerAdapter {
         this.botOwner = botOwner;
         this.prefix = prefix;
 
+        //split the commandList into their respective global hashmaps. This allows us to get specific command types easier
         for (CommandTemplateBase command : commandList) {
             switch (command.getCommandType()) {
                 case CHAT_COMMAND -> {
@@ -123,6 +128,26 @@ public class CommandHandler extends ListenerAdapter {
         logger.info("Registered " + messageContextCommandSet.size() + " message context menu command(s).");
     }
 
+    @Override
+    public void onReady(@NotNull ReadyEvent event) {
+        //we need to send slash, userContext, and messageContext commands to discord
+        List<CommandData> toAdd = new ArrayList<>();
+
+        slashCommandSet.forEach(c -> toAdd.add(c.getSlashCommand()));
+        userContextCommandSet.forEach(c -> toAdd.add(c.getUserContextCommand()));
+        messageContextCommandSet.forEach(c -> toAdd.add(c.getMessageContextCommand()));
+
+        event.getJDA().updateCommands().addCommands(toAdd).queue();
+        logger.info("Sent " + slashCommandSet.size() + " slash command(s), " +
+                userContextCommandSet.size() + " user context command(s), and " +
+                messageContextCommandSet.size() + " message context command(s) to Discord.");
+
+        //we should also check to ensure that there is an owner set. If not, we should be able to get it from JDA
+        if (null == botOwner || botOwner.isEmpty()) {
+            event.getJDA().retrieveApplicationInfo().onSuccess(c -> botOwner.add(c.getOwner().getId())).submit();
+            logger.warn("No owner IDs were given. New owner ID: " + botOwner.get(0));
+        }
+    }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -148,13 +173,11 @@ public class CommandHandler extends ListenerAdapter {
                     executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
                 }
             }
-
         }
     }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-
         SlashCommandTemplate command = slashCommandSet.stream().filter(
                 p -> p.getSlashCommand().getName().equalsIgnoreCase(event.getFullCommandName())
         ).findFirst().orElse(null);
@@ -163,32 +186,126 @@ public class CommandHandler extends ListenerAdapter {
             logger.debug(event.getUser().getName() + " has used the \"" + command.getCommandName() + "\" slash command");
             executeSlashCommand(command, event);
         }
-
     }
 
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
-        //TODO: implement this
+        SlashCommandTemplate command = slashCommandSet.stream().filter(
+                p -> p.getSlashCommand().getName().equalsIgnoreCase(event.getFullCommandName())
+        ).findFirst().orElse(null);
+
+        if (command instanceof AutoCompleteInterface autoCompleteInstance) {
+            logger.debug(event.getUser().getName() + " is using autocomplete on \"" + command.getCommandName() + "\"");
+            executeAutoCompleteInteraction(autoCompleteInstance, event);
+        }
     }
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        //TODO: implement this
+        //TODO: This is temporary until we add proper support for buttons
+        final String errorMessage = "Sorry, buttons are not implemented in Vera yet. They're coming soon (hopefully)";
+        if (event.isAcknowledged()) {
+            event.getHook().editOriginal(errorMessage).setComponents().queue();
+        }
+        event.getMessage().editMessage(errorMessage).setComponents().queue();
     }
 
     @Override
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
-        //TODO: implement this
+        for (UserContextTemplate command : userContextCommandSet) {
+            if (command instanceof StringSelect stringSelectInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInstance.getMenu().getId())) {
+                    executeStringSelectInteraction(stringSelectInstance, event);
+                    return;
+                }
+            }
+        }
+
+        for (MessageContextTemplate command : messageContextCommandSet) {
+            if (command instanceof StringSelect stringSelectInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInstance.getMenu().getId())) {
+                    executeStringSelectInteraction(stringSelectInstance, event);
+                    return;
+                }
+            }
+        }
+
+        for (SlashCommandTemplate command : slashCommandSet) {
+            if (command instanceof StringSelect stringSelectInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInstance.getMenu().getId())) {
+                    executeStringSelectInteraction(stringSelectInstance, event);
+                    return;
+                }
+            }
+        }
     }
 
     @Override
     public void onEntitySelectInteraction(@Nonnull EntitySelectInteractionEvent event) {
-        //TODO: implement this
+        for (UserContextTemplate command : userContextCommandSet) {
+            if (command instanceof EntitySelect entitySelectInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInstance.getMenu().getId())) {
+                    executeEntitySelectInteraction(entitySelectInstance, event);
+                    return;
+                }
+            }
+        }
+
+        for (MessageContextTemplate command : messageContextCommandSet) {
+            if (command instanceof EntitySelect entitySelectInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInstance.getMenu().getId())) {
+                    executeEntitySelectInteraction(entitySelectInstance, event);
+                    return;
+                }
+            }
+        }
+
+        for (SlashCommandTemplate command : slashCommandSet) {
+            if (command instanceof EntitySelect entitySelectInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInstance.getMenu().getId())) {
+                    executeEntitySelectInteraction(entitySelectInstance, event);
+                    return;
+                }
+            }
+        }
     }
 
+    /**
+     * Called by JDA whenever a ModalInteractionEvent fires on the event bus. Modals are supported by the Slash, userContext,
+     * and messageContext templates, and we check every registered command of those types to see if they are responsible for
+     * the event. If a match is found, we pass the event to the command and allow it to handle it further.
+     *
+     * @param event The {@link ModalInteractionEvent that JDA sent to Vera.}
+     * @implNote This method loops through every registered command that supports
+     */
     @Override
     public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
-        //TODO: implement this
+        for (MessageContextTemplate command : messageContextCommandSet) {
+            if (command instanceof ModalInterface modalInstance) {
+                if (modalInstance.getModal().getId().equals(event.getModalId())) {
+                    executeModalInteraction(modalInstance, event);
+                    return;
+                }
+            }
+        }
+
+        for (UserContextTemplate command : userContextCommandSet) {
+            if (command instanceof ModalInterface modalInstance) {
+                if (modalInstance.getModal().getId().equals(event.getModalId())) {
+                    executeModalInteraction(modalInstance, event);
+                    return;
+                }
+            }
+        }
+
+        for (SlashCommandTemplate command : slashCommandSet) {
+            if (command instanceof ModalInterface modalInstance) {
+                if (modalInstance.getModal().getId().equals(event.getModalId())) {
+                    executeModalInteraction((ModalInterface) command, event);
+                    return;
+                }
+            }
+        }
     }
 
     @Override
@@ -212,28 +329,6 @@ public class CommandHandler extends ListenerAdapter {
         if (null != command) {
             logger.debug(event.getUser().getName() + " has used the \"" + command.getCommandName() + "\" slash command");
             executeMessageContextCommand(command, event);
-        }
-    }
-
-    @Override
-    public void onReady(@NotNull ReadyEvent event) {
-        //we need to send slash, userContext, and messageContext commands to discord
-        List<CommandData> toadd = new ArrayList<>();
-
-        slashCommandSet.forEach(c -> toadd.add(c.getSlashCommand()));
-        userContextCommandSet.forEach(c -> toadd.add(c.getUserContextCommand()));
-        messageContextCommandSet.forEach(c -> toadd.add(c.getMessageContextCommand()));
-
-        event.getJDA().updateCommands().addCommands(toadd).queue();
-        logger.info("Sent " + slashCommandSet.size() + " slash command(s), " +
-                userContextCommandSet.size() + " user context command(s), and " +
-                messageContextCommandSet.size() + " message context command(s) to Discord.");
-
-
-        //we should also check to ensure that there is an owner set. If not, we should be able to get it from JDA
-        if (null == botOwner || botOwner.isEmpty()) {
-            event.getJDA().retrieveApplicationInfo().onSuccess(c -> botOwner.add(c.getOwner().getId())).submit();
-            logger.warn("No owner IDs were given. New owner ID: " + botOwner.get(0));
         }
     }
 
@@ -265,19 +360,85 @@ public class CommandHandler extends ListenerAdapter {
         });
     }
 
+    private void executeAutoCompleteInteraction(AutoCompleteInterface template, CommandAutoCompleteInteractionEvent event) {
+        this.commandPool.submit(() -> {
+            try {
+                template.executeAutocomplete(event);
+            } catch (final Exception e) {
+                //we don't really care if this breaks tbh... I'll just log this
+                logger.error("Unable to autocomplete the \"" + event.getFullCommandName() + "\" slash command");
+            }
+        });
+    }
+
+    private void executeStringSelectInteraction(StringSelect template, StringSelectInteractionEvent event) {
+        this.commandPool.submit(() -> {
+            try {
+                template.executeStringSelectInteraction(event);
+            } catch (Exception e) {
+                if (event.isAcknowledged()) {
+                    event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
+                } else {
+                    event.reply("Sorry, I was unable to execute that command. Please try again later").setEphemeral(true).queue();
+                }
+            }
+        });
+    }
+
+    private void executeEntitySelectInteraction(EntitySelect template, EntitySelectInteractionEvent event) {
+        this.commandPool.submit(() -> {
+            try {
+                template.executeEntitySelectInteraction(event);
+            } catch (Exception e) {
+                if (event.isAcknowledged()) {
+                    event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
+                } else {
+                    event.reply("Sorry, I was unable to execute that command. Please try again later").setEphemeral(true).queue();
+                }
+            }
+        });
+    }
+
+    private void executeModalInteraction(ModalInterface template, ModalInteractionEvent event) {
+        this.commandPool.submit(() -> {
+            try {
+                template.executeModal(event);
+            } catch (Exception e) {
+                //this one is very important to catch. The modal will not close unless it gets handled.
+                if (event.isAcknowledged()) {
+                    event.getHook().editOriginal("Sorry, I was unable to execute that command. Please try again later").queue();
+                } else {
+                    event.reply("Sorry, I was unable to execute that command. Please try again later").setEphemeral(true).queue();
+                }
+            }
+        });
+    }
+
     private void executeUserContextCommand(UserContextTemplate template, UserContextInteractionEvent event) {
-        try {
-            template.executeUserContextCommand(event);
-        } catch (Exception e) {
-            System.out.println("I was made by someone who was too lazy to handle this correctly!");
-        }
+        this.commandPool.submit(() -> {
+            try {
+                template.executeUserContextCommand(event);
+            } catch (final Exception e) {
+                if (event.isAcknowledged()) {
+                    event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
+                } else {
+                    event.reply("Sorry, I was unable to execute that command. Please try again later").setEphemeral(true).queue();
+                }
+            }
+        });
     }
 
     private void executeMessageContextCommand(MessageContextTemplate template, MessageContextInteractionEvent event) {
-        try {
-            template.executeMessageContextCommand(event);
-        } catch (Exception e) {
-            System.out.println("I was made by someone who was too lazy to handle this correctly!");
-        }
+        this.commandPool.submit(() -> {
+            try {
+                template.executeMessageContextCommand(event);
+            } catch (final Exception e) {
+                if (event.isAcknowledged()) {
+                    event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
+                } else {
+                    event.reply("Sorry, I was unable to execute that command. Please try again later").setEphemeral(true).queue();
+                }
+            }
+        });
     }
 }

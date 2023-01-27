@@ -1,7 +1,7 @@
 /*
  * Vera - a common library for all of TCN's discord bots.
  *
- * Copyright (C) 2022 Thomas Wessel and the rest of Team Creative Name
+ * Copyright (C) 2023 Thomas Wessel and the rest of Team Creative Name
  *
  *
  * This library is licensed under the GNU Lesser General Public License v2.1
@@ -25,24 +25,36 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera.testCommands;
+package com.tcn.vera.testCommands.slashCommands;
 
 import com.tcn.vera.commands.SlashCommandTemplate;
+import com.tcn.vera.interactions.StringSelect;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
-public class BasicSlashCommand extends SlashCommandTemplate {
+public class StringSelectSlashCommand extends SlashCommandTemplate implements StringSelect {
+    StringSelectMenu menu = StringSelectMenu.create("bob2").addOption("test1", "test1").addOption("test2", "test2").build();
 
-    public BasicSlashCommand() {
-        this.commandName = "basicslashtest";
-        this.help = "test the basic ability to create and respond to a slash command";
-        this.slashCommand = Commands.slash(getCommandName(), getCommandHelp());
+    public StringSelectSlashCommand(){
+        this.commandName = "string-select-test";
+        this.help = "A command to test String selections";
     }
 
     @Override
     public void executeSlashCommand(SlashCommandInteractionEvent event) {
-        event.reply("I am responding to your slash command!").queue();
+        event.reply("Please select the user you'd like the ping").addComponents(ActionRow.of(menu)).queue();
+
     }
 
+    @Override
+    public void executeStringSelectInteraction(StringSelectInteractionEvent event) {
+        event.reply("You chose: " + event.getInteraction().toString()).queue();
+    }
 
+    @Override
+    public StringSelectMenu getMenu() {
+        return menu;
+    }
 }
