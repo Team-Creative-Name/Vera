@@ -58,6 +58,7 @@ public class DiscordTestBot {
                 .addCommand(new UserContextPing())
                 .addCommand(new StringSelectSlashCommand())
                 .addCommand(new UserContextStringSelect())
+                .addCommand(new ButtonSlashCommand())
                 .changePrefix("!")
                 .build();
 

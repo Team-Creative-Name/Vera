@@ -28,10 +28,8 @@
 package com.tcn.vera.eventHandlers;
 
 import com.tcn.vera.commands.*;
-import com.tcn.vera.interactions.AutoCompleteInterface;
-import com.tcn.vera.interactions.EntitySelect;
-import com.tcn.vera.interactions.ModalInterface;
-import com.tcn.vera.interactions.StringSelect;
+import com.tcn.vera.interactions.*;
+import com.tcn.vera.utils.CommandCache;
 import com.tcn.vera.utils.VeraUtils;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -56,6 +54,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 /**
  * The command handler for Vera. This class must be constructed via the CommandHandlerBuilder.
@@ -67,6 +66,9 @@ public class CommandHandler extends ListenerAdapter {
     private final Set<SlashCommandTemplate> slashCommandSet = ConcurrentHashMap.newKeySet();
     private final Set<UserContextTemplate> userContextCommandSet = ConcurrentHashMap.newKeySet();
     private final Set<MessageContextTemplate> messageContextCommandSet = ConcurrentHashMap.newKeySet();
+
+    //keeps track of the last 100 buttons created by the bot. Allows us to respond to commands with unique buttons IDs with every command creation
+    private final CommandCache<String, Consumer<? super ButtonInteractionEvent>> buttons = new CommandCache<>(100);
     private final ExecutorService commandPool = Executors.newCachedThreadPool(VeraUtils.createThreadFactory("VeraCommandRunner", false));
     private final Logger logger;
 
@@ -120,6 +122,11 @@ public class CommandHandler extends ListenerAdapter {
                 default ->
                         throw new IllegalArgumentException("Sorry, this command handler is only capable of handling Chat, Slash, and Context commands. " +
                                 "If you have created your own command type, you will have to extend this class and add support for it here!");
+            }
+
+            //aside from splitting our types out, we also need to put all buttons into their cache
+            if(command instanceof ButtonInterface buttonInterface){
+                buttons.add(buttonInterface.getButtonClassID(), buttonInterface::executeButton);
             }
         }
         logger.info("Registered " + chatCommandSet.size() + " chat command(s).");
@@ -202,12 +209,14 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        //TODO: This is temporary until we add proper support for buttons
-        final String errorMessage = "Sorry, buttons are not implemented in Vera yet. They're coming soon (hopefully)";
-        if (event.isAcknowledged()) {
-            event.getHook().editOriginal(errorMessage).setComponents().queue();
+        Consumer<? super ButtonInteractionEvent> callback = buttons.find(buttonIdentifier -> event.getComponentId().startsWith(buttonIdentifier));
+
+        if (callback == null) {
+            event.reply("This button is no longer functional, please try running the command again.").setEphemeral(true).queue();
+            return;
         }
-        event.getMessage().editMessage(errorMessage).setComponents().queue();
+
+        executeButtonInteraction(callback, event);
     }
 
     @Override
@@ -367,6 +376,16 @@ public class CommandHandler extends ListenerAdapter {
             } catch (final Exception e) {
                 //we don't really care if this breaks tbh... I'll just log this
                 logger.error("Unable to autocomplete the \"" + event.getFullCommandName() + "\" slash command");
+            }
+        });
+    }
+
+    private void executeButtonInteraction(Consumer<? super ButtonInteractionEvent> consumer, ButtonInteractionEvent event) {
+        this.commandPool.submit(() -> {
+            try {
+               consumer.accept(event);
+            }catch (final Exception e) {
+                logger.error("Button interaction failed! Button ID: " + event.getId());
             }
         });
     }
