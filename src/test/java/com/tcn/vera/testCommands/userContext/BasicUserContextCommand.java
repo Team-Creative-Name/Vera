@@ -27,7 +27,7 @@
  */
 package com.tcn.vera.testCommands.userContext;
 
-import com.tcn.vera.commands.UserContextTemplate;
+import com.tcn.vera.commands.templates.UserContextTemplate;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 
 public class BasicUserContextCommand extends UserContextTemplate {

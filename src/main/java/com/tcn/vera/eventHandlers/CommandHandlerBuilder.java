@@ -27,9 +27,9 @@
  */
 package com.tcn.vera.eventHandlers;
 
-import com.tcn.vera.commands.ChatCommandTemplate;
-import com.tcn.vera.commands.CommandTemplateBase;
-import com.tcn.vera.commands.CommandType;
+import com.tcn.vera.commands.templates.ChatCommandTemplate;
+import com.tcn.vera.commands.templates.CommandTemplateBase;
+import com.tcn.vera.commands.templates.CommandType;
 
 import java.util.ArrayList;
 import java.util.Arrays;

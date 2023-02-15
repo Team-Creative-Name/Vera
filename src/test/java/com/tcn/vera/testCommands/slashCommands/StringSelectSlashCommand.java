@@ -27,14 +27,14 @@
  */
 package com.tcn.vera.testCommands.slashCommands;
 
-import com.tcn.vera.commands.SlashCommandTemplate;
-import com.tcn.vera.interactions.StringSelect;
+import com.tcn.vera.commands.templates.SlashCommandTemplate;
+import com.tcn.vera.commands.interactions.StringSelectInterface;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
-public class StringSelectSlashCommand extends SlashCommandTemplate implements StringSelect {
+public class StringSelectSlashCommand extends SlashCommandTemplate implements StringSelectInterface {
     StringSelectMenu menu = StringSelectMenu.create("bob2").addOption("test1", "test1").addOption("test2", "test2").build();
 
     public StringSelectSlashCommand(){

@@ -27,7 +27,7 @@
  */
 package com.tcn.vera.testCommands.chatCommands;
 
-import com.tcn.vera.commands.ChatCommandTemplate;
+import com.tcn.vera.commands.templates.ChatCommandTemplate;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 

@@ -25,22 +25,30 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera.interactions;
+package com.tcn.vera.commands.interactions;
 
-import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 /**
- * This interface allows the addition of autocomplete interactions to a slash command. Because only the slash command
- * can use autocomplete, implementing this in any class other than ones extending {@link com.tcn.vera.commands.SlashCommandTemplate}
- * will have no effect.
+ * This interface allows for your command to handle string select interactions. This interface is only useful on slash and
+ * context commands
  */
-public interface AutoCompleteInterface {
+public interface StringSelectInterface {
 
     /**
-     * The code executed when the user attempts to autofill a slash command.
+     * The code executed when discord fires the {@link StringSelectInteractionEvent} event related to this command.
      *
-     * @param event The {@link CommandAutoCompleteInteractionEvent} sent by discord
+     * @param event The event that contains the user's selection.
      */
-    void executeAutocomplete(CommandAutoCompleteInteractionEvent event);
+    void executeStringSelectInteraction(StringSelectInteractionEvent event);
 
+    /**
+     * In order for the {@link com.tcn.vera.eventHandlers.CommandHandler} to match a string select event to this command, it must
+     * be able to see it. Please ensure that the menu returned by this method is the same as the one that you used as a
+     * response to the Discord interaction event.
+     *
+     * @return The menu sent to discord as a reply
+     */
+    StringSelectMenu getMenu();
 }

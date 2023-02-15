@@ -27,7 +27,7 @@
  */
 package com.tcn.vera.testCommands.messageContext;
 
-import com.tcn.vera.commands.MessageContextTemplate;
+import com.tcn.vera.commands.templates.MessageContextTemplate;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;

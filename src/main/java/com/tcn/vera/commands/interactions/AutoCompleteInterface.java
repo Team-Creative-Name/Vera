@@ -25,20 +25,23 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera.testCommands.userContext;
+package com.tcn.vera.commands.interactions;
 
-import com.tcn.vera.commands.templates.UserContextTemplate;
-import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
+import com.tcn.vera.commands.templates.SlashCommandTemplate;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 
-public class UserContextPing extends UserContextTemplate{
+/**
+ * This interface allows the addition of autocomplete interactions to a slash command. Because only the slash command
+ * can use autocomplete, implementing this in any class other than ones extending {@link SlashCommandTemplate}
+ * will have no effect.
+ */
+public interface AutoCompleteInterface {
 
-    public UserContextPing(){
-        this.commandName = "Mention this user";
-        this.help = "Mentions the user you clicked on";
-    }
-    @Override
-    public void executeUserContextCommand(UserContextInteractionEvent event) {
-        event.reply(event.getTargetMember().getAsMention()).queue();
-        System.out.println("test");
-    }
+    /**
+     * The code executed when the user attempts to autofill a slash command.
+     *
+     * @param event The {@link CommandAutoCompleteInteractionEvent} sent by discord
+     */
+    void executeAutocomplete(CommandAutoCompleteInteractionEvent event);
+
 }

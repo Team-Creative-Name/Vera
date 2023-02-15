@@ -1,7 +1,7 @@
 package com.tcn.vera.testCommands.slashCommands;
 
-import com.tcn.vera.commands.SlashCommandTemplate;
-import com.tcn.vera.interactions.ButtonInterface;
+import com.tcn.vera.commands.templates.SlashCommandTemplate;
+import com.tcn.vera.commands.interactions.ButtonInterface;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;

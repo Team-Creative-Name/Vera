@@ -1,4 +1,4 @@
-package com.tcn.vera.interactions;
+package com.tcn.vera.commands.interactions;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 

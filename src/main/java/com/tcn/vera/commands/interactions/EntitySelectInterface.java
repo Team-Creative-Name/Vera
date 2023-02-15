@@ -25,30 +25,35 @@
  * For more information, please check out the original repository of this project on github
  * https://github.com/Team-Creative-Name/Vera
  */
-package com.tcn.vera.interactions;
+package com.tcn.vera.commands.interactions;
 
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import com.tcn.vera.commands.templates.MessageContextTemplate;
+import com.tcn.vera.commands.templates.SlashCommandTemplate;
+import com.tcn.vera.commands.templates.UserContextTemplate;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 
 /**
- * This interface allows for your command to handle string select interactions. This interface is only useful on slash and
- * context commands
+ * This interface allows for the Vera Command Handler to send entity select interactions to your command. This interface only works for
+ * {@link SlashCommandTemplate},
+ * {@link UserContextTemplate}, and {@link MessageContextTemplate} command templates.
  */
-public interface StringSelect {
+public interface EntitySelectInterface {
 
     /**
-     * The code executed when discord fires the {@link StringSelectInteractionEvent} event related to this command.
+     * The code executed when discord fires the {@link EntitySelectInteractionEvent} event related to this command.
      *
      * @param event The event that contains the user's selection.
      */
-    void executeStringSelectInteraction(StringSelectInteractionEvent event);
+    void executeEntitySelectInteraction(EntitySelectInteractionEvent event);
 
     /**
-     * In order for the {@link com.tcn.vera.eventHandlers.CommandHandler} to match a string select event to this command, it must
+     * In order for the {@link com.tcn.vera.eventHandlers.CommandHandler} to match an entity select event to this command, it must
      * be able to see it. Please ensure that the menu returned by this method is the same as the one that you used as a
      * response to the Discord interaction event.
      *
      * @return The menu sent to discord as a reply
      */
-    StringSelectMenu getMenu();
+    EntitySelectMenu getMenu();
+
 }

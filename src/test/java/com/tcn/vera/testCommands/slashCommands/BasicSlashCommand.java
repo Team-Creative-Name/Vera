@@ -27,7 +27,7 @@
  */
 package com.tcn.vera.testCommands.slashCommands;
 
-import com.tcn.vera.commands.SlashCommandTemplate;
+import com.tcn.vera.commands.templates.SlashCommandTemplate;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 

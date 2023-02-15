@@ -27,8 +27,8 @@
  */
 package com.tcn.vera.eventHandlers;
 
-import com.tcn.vera.commands.*;
-import com.tcn.vera.interactions.*;
+import com.tcn.vera.commands.interactions.*;
+import com.tcn.vera.commands.templates.*;
 import com.tcn.vera.utils.CommandCache;
 import com.tcn.vera.utils.VeraUtils;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -222,27 +222,27 @@ public class CommandHandler extends ListenerAdapter {
     @Override
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         for (UserContextTemplate command : userContextCommandSet) {
-            if (command instanceof StringSelect stringSelectInstance) {
-                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInstance.getMenu().getId())) {
-                    executeStringSelectInteraction(stringSelectInstance, event);
+            if (command instanceof StringSelectInterface stringSelectInterfaceInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInterfaceInstance.getMenu().getId())) {
+                    executeStringSelectInteraction(stringSelectInterfaceInstance, event);
                     return;
                 }
             }
         }
 
         for (MessageContextTemplate command : messageContextCommandSet) {
-            if (command instanceof StringSelect stringSelectInstance) {
-                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInstance.getMenu().getId())) {
-                    executeStringSelectInteraction(stringSelectInstance, event);
+            if (command instanceof StringSelectInterface stringSelectInterfaceInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInterfaceInstance.getMenu().getId())) {
+                    executeStringSelectInteraction(stringSelectInterfaceInstance, event);
                     return;
                 }
             }
         }
 
         for (SlashCommandTemplate command : slashCommandSet) {
-            if (command instanceof StringSelect stringSelectInstance) {
-                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInstance.getMenu().getId())) {
-                    executeStringSelectInteraction(stringSelectInstance, event);
+            if (command instanceof StringSelectInterface stringSelectInterfaceInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(stringSelectInterfaceInstance.getMenu().getId())) {
+                    executeStringSelectInteraction(stringSelectInterfaceInstance, event);
                     return;
                 }
             }
@@ -252,27 +252,27 @@ public class CommandHandler extends ListenerAdapter {
     @Override
     public void onEntitySelectInteraction(@Nonnull EntitySelectInteractionEvent event) {
         for (UserContextTemplate command : userContextCommandSet) {
-            if (command instanceof EntitySelect entitySelectInstance) {
-                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInstance.getMenu().getId())) {
-                    executeEntitySelectInteraction(entitySelectInstance, event);
+            if (command instanceof EntitySelectInterface entitySelectInterfaceInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInterfaceInstance.getMenu().getId())) {
+                    executeEntitySelectInteraction(entitySelectInterfaceInstance, event);
                     return;
                 }
             }
         }
 
         for (MessageContextTemplate command : messageContextCommandSet) {
-            if (command instanceof EntitySelect entitySelectInstance) {
-                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInstance.getMenu().getId())) {
-                    executeEntitySelectInteraction(entitySelectInstance, event);
+            if (command instanceof EntitySelectInterface entitySelectInterfaceInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInterfaceInstance.getMenu().getId())) {
+                    executeEntitySelectInteraction(entitySelectInterfaceInstance, event);
                     return;
                 }
             }
         }
 
         for (SlashCommandTemplate command : slashCommandSet) {
-            if (command instanceof EntitySelect entitySelectInstance) {
-                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInstance.getMenu().getId())) {
-                    executeEntitySelectInteraction(entitySelectInstance, event);
+            if (command instanceof EntitySelectInterface entitySelectInterfaceInstance) {
+                if (event.getSelectMenu().getId().equalsIgnoreCase(entitySelectInterfaceInstance.getMenu().getId())) {
+                    executeEntitySelectInteraction(entitySelectInterfaceInstance, event);
                     return;
                 }
             }
@@ -390,7 +390,7 @@ public class CommandHandler extends ListenerAdapter {
         });
     }
 
-    private void executeStringSelectInteraction(StringSelect template, StringSelectInteractionEvent event) {
+    private void executeStringSelectInteraction(StringSelectInterface template, StringSelectInteractionEvent event) {
         this.commandPool.submit(() -> {
             try {
                 template.executeStringSelectInteraction(event);
@@ -404,7 +404,7 @@ public class CommandHandler extends ListenerAdapter {
         });
     }
 
-    private void executeEntitySelectInteraction(EntitySelect template, EntitySelectInteractionEvent event) {
+    private void executeEntitySelectInteraction(EntitySelectInterface template, EntitySelectInteractionEvent event) {
         this.commandPool.submit(() -> {
             try {
                 template.executeEntitySelectInteraction(event);

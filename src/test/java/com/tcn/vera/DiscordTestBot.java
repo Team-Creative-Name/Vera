@@ -34,7 +34,7 @@ import com.tcn.vera.testCommands.messageContext.BasicMessageContextCommand;
 import com.tcn.vera.testCommands.slashCommands.*;
 import com.tcn.vera.testCommands.userContext.BasicUserContextCommand;
 import com.tcn.vera.testCommands.userContext.UserContextPing;
-import com.tcn.vera.testCommands.userContext.UserContextStringSelect;
+import com.tcn.vera.testCommands.userContext.UserContextStringSelectInterface;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -57,7 +57,7 @@ public class DiscordTestBot {
                 .addCommand(new EntitySelectSlashCommand())
                 .addCommand(new UserContextPing())
                 .addCommand(new StringSelectSlashCommand())
-                .addCommand(new UserContextStringSelect())
+                .addCommand(new UserContextStringSelectInterface())
                 .addCommand(new ButtonSlashCommand())
                 .changePrefix("!")
                 .build();

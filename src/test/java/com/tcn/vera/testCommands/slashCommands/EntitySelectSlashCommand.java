@@ -27,14 +27,14 @@
  */
 package com.tcn.vera.testCommands.slashCommands;
 
-import com.tcn.vera.commands.SlashCommandTemplate;
-import com.tcn.vera.interactions.EntitySelect;
+import com.tcn.vera.commands.templates.SlashCommandTemplate;
+import com.tcn.vera.commands.interactions.EntitySelectInterface;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 
-public class EntitySelectSlashCommand extends SlashCommandTemplate implements EntitySelect{
+public class EntitySelectSlashCommand extends SlashCommandTemplate implements EntitySelectInterface {
 
     EntitySelectMenu menu = EntitySelectMenu.create("bob", EntitySelectMenu.SelectTarget.USER).build();
     public EntitySelectSlashCommand(){
