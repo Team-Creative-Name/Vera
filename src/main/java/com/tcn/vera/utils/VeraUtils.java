@@ -27,6 +27,7 @@
  */
 package com.tcn.vera.utils;
 
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,4 +82,14 @@ public class VeraUtils {
         }
     }
 
+    public static String getButtonName(String buttonID){
+        if(buttonID != null && (buttonID.lastIndexOf(':') != buttonID.length() - 1)){
+            return buttonID.substring(buttonID.lastIndexOf(':') + 1);
+        }
+        return " ";
+    }
+
+    public static String getButtonName(ButtonInteractionEvent event){
+       return getButtonName(event.getButton().getId());
+    }
 }

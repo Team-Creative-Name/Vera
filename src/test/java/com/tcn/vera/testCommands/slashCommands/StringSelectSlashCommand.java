@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class StringSelectSlashCommand extends SlashCommandTemplate implements StringSelectInterface {
+
     StringSelectMenu menu = StringSelectMenu.create("bob2").addOption("test1", "test1").addOption("test2", "test2").build();
 
     public StringSelectSlashCommand(){

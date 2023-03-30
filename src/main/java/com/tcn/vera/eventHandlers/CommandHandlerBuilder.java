@@ -30,6 +30,7 @@ package com.tcn.vera.eventHandlers;
 import com.tcn.vera.commands.templates.ChatCommandTemplate;
 import com.tcn.vera.commands.templates.CommandTemplateBase;
 import com.tcn.vera.commands.templates.CommandType;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +40,11 @@ public class CommandHandlerBuilder {
     private final ArrayList<String> botOwner = new ArrayList<>();
     private String prefix = "!";
 
+    private ButtonHandler buttonHandler = null;
+
     public CommandHandler build() {
         runChecks();
-        return new CommandHandler(commandList, botOwner, prefix);
+        return new CommandHandler(commandList, botOwner, prefix, buttonHandler);
     }
 
     private void runChecks() {
@@ -63,6 +66,12 @@ public class CommandHandlerBuilder {
                     throw new IllegalArgumentException("Sorry, chat commands cannot have a space in their name or aliases");
                 }
             }
+        }
+
+        if(buttonHandler == null){
+            LoggerFactory.getLogger("Vera: Command Handler").warn("No button handler was provided to the command handler. " +
+                    "If you want to use buttons, please provide a button handler to the command handler builder via the addButtonHandler method.");
+            buttonHandler = new ButtonHandler();
         }
     }
 
@@ -109,6 +118,11 @@ public class CommandHandlerBuilder {
      */
     public CommandHandlerBuilder changePrefix(String newPrefix) {
         prefix = newPrefix;
+        return this;
+    }
+
+    public CommandHandlerBuilder addButtonHandler(ButtonHandler buttonHandler) {
+        this.buttonHandler = buttonHandler;
         return this;
     }
 

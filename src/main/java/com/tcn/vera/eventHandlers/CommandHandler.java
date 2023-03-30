@@ -29,7 +29,6 @@ package com.tcn.vera.eventHandlers;
 
 import com.tcn.vera.commands.interactions.*;
 import com.tcn.vera.commands.templates.*;
-import com.tcn.vera.utils.CommandCache;
 import com.tcn.vera.utils.VeraUtils;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -54,7 +53,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 /**
  * The command handler for Vera. This class must be constructed via the CommandHandlerBuilder.
@@ -66,9 +64,7 @@ public class CommandHandler extends ListenerAdapter {
     private final Set<SlashCommandTemplate> slashCommandSet = ConcurrentHashMap.newKeySet();
     private final Set<UserContextTemplate> userContextCommandSet = ConcurrentHashMap.newKeySet();
     private final Set<MessageContextTemplate> messageContextCommandSet = ConcurrentHashMap.newKeySet();
-
-    //keeps track of the last 100 buttons created by the bot. Allows us to respond to commands with unique buttons IDs with every command creation
-    private final CommandCache<String, Consumer<? super ButtonInteractionEvent>> buttons = new CommandCache<>(100);
+    private final ButtonHandler buttonHandler;
     private final ExecutorService commandPool = Executors.newCachedThreadPool(VeraUtils.createThreadFactory("VeraCommandRunner", false));
     private final Logger logger;
 
@@ -79,12 +75,13 @@ public class CommandHandler extends ListenerAdapter {
     /**
      * To create an instance of this class, please use the {@link CommandHandlerBuilder}.
      */
-    CommandHandler(ArrayList<? extends CommandTemplateBase> commandList, ArrayList<String> botOwner, String prefix) {
+    CommandHandler(ArrayList<? extends CommandTemplateBase> commandList, ArrayList<String> botOwner, String prefix, ButtonHandler buttonHandler) {
         logger = LoggerFactory.getLogger("Vera: Command Handler");
         this.botOwner = botOwner;
         this.prefix = prefix;
+        this.buttonHandler = buttonHandler;
 
-        //split the commandList into their respective global hashmaps. This allows us to get specific command types easier
+        //split the commandList into their respective hashmaps. This allows us to get specific command types easier
         for (CommandTemplateBase command : commandList) {
             switch (command.getCommandType()) {
                 case CHAT_COMMAND -> {
@@ -126,7 +123,7 @@ public class CommandHandler extends ListenerAdapter {
 
             //aside from splitting our types out, we also need to put all buttons into their cache
             if(command instanceof ButtonInterface buttonInterface){
-                buttons.add(buttonInterface.getButtonClassID(), buttonInterface::executeButton);
+                buttonHandler.registerButtonSet(buttonInterface.getButtonClassID(), buttonInterface::executeButton);
             }
         }
         logger.info("Registered " + chatCommandSet.size() + " chat command(s).");
@@ -209,14 +206,9 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        Consumer<? super ButtonInteractionEvent> callback = buttons.find(buttonIdentifier -> event.getComponentId().startsWith(buttonIdentifier));
-
-        if (callback == null) {
-            event.reply("This button is no longer functional, please try running the command again.").setEphemeral(true).queue();
-            return;
+        if(buttonHandler != null){
+            executeButtonInteraction(event);
         }
-
-        executeButtonInteraction(callback, event);
     }
 
     @Override
@@ -380,10 +372,10 @@ public class CommandHandler extends ListenerAdapter {
         });
     }
 
-    private void executeButtonInteraction(Consumer<? super ButtonInteractionEvent> consumer, ButtonInteractionEvent event) {
+    private void executeButtonInteraction(ButtonInteractionEvent event) {
         this.commandPool.submit(() -> {
             try {
-               consumer.accept(event);
+               buttonHandler.onEvent(event);
             }catch (final Exception e) {
                 logger.error("Button interaction failed! Button ID: " + event.getId());
             }

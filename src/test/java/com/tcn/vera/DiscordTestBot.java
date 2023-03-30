@@ -27,10 +27,13 @@
  */
 package com.tcn.vera;
 
+import com.tcn.vera.eventHandlers.ButtonHandler;
 import com.tcn.vera.eventHandlers.CommandHandler;
 import com.tcn.vera.eventHandlers.CommandHandlerBuilder;
 import com.tcn.vera.testCommands.chatCommands.BasicChatCommand;
 import com.tcn.vera.testCommands.messageContext.BasicMessageContextCommand;
+import com.tcn.vera.testCommands.paginatorCommands.EmbedPaginatorCommand;
+import com.tcn.vera.testCommands.paginatorCommands.EmbedPaginatorMessage;
 import com.tcn.vera.testCommands.slashCommands.*;
 import com.tcn.vera.testCommands.userContext.BasicUserContextCommand;
 import com.tcn.vera.testCommands.userContext.UserContextPing;
@@ -46,6 +49,8 @@ public class DiscordTestBot {
 
         JDA discordBot = JDABuilder.createDefault(Secrets.discordToken).enableIntents(GatewayIntent.MESSAGE_CONTENT).build();
 
+        ButtonHandler buttonHandler = new ButtonHandler();
+
         CommandHandler veraHandler = new CommandHandlerBuilder()
                 .addOwner(Secrets.ownerID)
                 .addCommand(new BasicChatCommand())
@@ -59,8 +64,12 @@ public class DiscordTestBot {
                 .addCommand(new StringSelectSlashCommand())
                 .addCommand(new UserContextStringSelectInterface())
                 .addCommand(new ButtonSlashCommand())
+                .addCommand(new EmbedPaginatorCommand(buttonHandler))
+                .addCommand(new EmbedPaginatorMessage(buttonHandler))
                 .changePrefix("!")
+                .addButtonHandler(buttonHandler)
                 .build();
+
 
         discordBot.addEventListener(veraHandler);
 

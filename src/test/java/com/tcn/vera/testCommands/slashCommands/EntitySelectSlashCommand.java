@@ -34,7 +34,9 @@ import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionE
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 
+
 public class EntitySelectSlashCommand extends SlashCommandTemplate implements EntitySelectInterface {
+
 
     EntitySelectMenu menu = EntitySelectMenu.create("bob", EntitySelectMenu.SelectTarget.USER).build();
     public EntitySelectSlashCommand(){
