@@ -45,6 +45,7 @@ import java.util.function.Consumer;
  */
 public class ButtonHandler implements EventListener {
     int cacheSize = 100;
+    private final CommandCache<String, Consumer<? super ButtonInteractionEvent>> listeners = new CommandCache<>(cacheSize);
 
     /**
      * Creates a new ButtonHandler with a cache size of 100. If you need to support more buttons at a time, please use
@@ -55,16 +56,16 @@ public class ButtonHandler implements EventListener {
 
     /**
      * Creates a new ButtonHandler with a custom cache size.
+     *
      * @param cacheSize The maximum number of buttons that can be registered at a time. If more buttons are registered, the oldest button will be removed.
      */
     public ButtonHandler(int cacheSize) {
         this.cacheSize = cacheSize;
     }
 
-    private final CommandCache<String, Consumer<? super ButtonInteractionEvent>> listeners = new CommandCache<>(cacheSize);
-
     /**
      * This method is called when a button is pressed. It will check if the button is registered, and if it is, it will call the callback.
+     *
      * @param event The {@link ButtonInteractionEvent} that was fired.
      */
     public void onEvent(ButtonInteractionEvent event) {
@@ -72,14 +73,15 @@ public class ButtonHandler implements EventListener {
 
         if (callback != null) {
             callback.accept(event);
-        }else{
+        } else {
             event.reply("This button is not valid").setEphemeral(true).queue();
         }
     }
 
     /**
      * Registers a button with a callback. The callback will be called when the button is pressed.
-     * @param prefix The prefix of the button. This is used to identify the button. The prefix should be the value set in {@link ButtonInterface#getButtonClassID()}.
+     *
+     * @param prefix   The prefix of the button. This is used to identify the button. The prefix should be the value set in {@link ButtonInterface#getButtonClassID()}.
      * @param callback The callback to call when the button is pressed.
      */
     public void registerButtonSet(String prefix, Consumer<? super ButtonInteractionEvent> callback) {

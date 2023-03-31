@@ -34,7 +34,6 @@ import javax.annotation.Nonnull;
  * when {@link com.tcn.vera.eventHandlers.CommandHandler} attempts to handle it. Please note that any class using these types must also
  * implement any methods that the default command template for that type does. For example, a class marked with the {@link CommandType#CHAT_COMMAND}
  * type should either extend or reimplement everything found in {@link ChatCommandTemplate}.
- *
  */
 public enum CommandType {
 

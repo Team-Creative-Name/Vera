@@ -67,7 +67,6 @@ import java.util.Objects;
  *         this.messageContextCommand = Commands.context(Command.Type.USER, getCommandName());
  *     }
  * </pre></blockquote>
- *
  */
 public abstract class UserContextTemplate extends CommandTemplateBase {
 

@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,7 +26,7 @@ public class EmbedPaginator extends PaginatorBase {
         super(message, commandEvent, numberOfPages, shouldWrap, userID, buttonHandler);
         this.embedList = embedList;
 
-        if(numberOfPages > 1){
+        if (numberOfPages > 1) {
             //left, stop, right buttons
             addButton(Button.primary(getFullButtonID("previous"), "◀️ Go Left"));
             addButton(Button.danger(getFullButtonID("stop"), Emoji.fromUnicode("\uD83D\uDDD1️")));
@@ -39,21 +38,21 @@ public class EmbedPaginator extends PaginatorBase {
 
     @Override
     public void onButtonClick(ButtonInteractionEvent event) {
-        if(event.getUser().getIdLong() != userID){
+        if (event.getUser().getIdLong() != userID) {
             event.reply("You are not the user who created this menu!").setEphemeral(true).queue();
             return;
         }
 
         String pressedButton = event.getComponentId();
 
-        if(getFullButtonID("previous").equals(pressedButton)){
+        if (getFullButtonID("previous").equals(pressedButton)) {
             decPageNum();
-        }else if (getFullButtonID("next").equals(pressedButton)){
+        } else if (getFullButtonID("next").equals(pressedButton)) {
             incPageNum();
         } else if (getFullButtonID("stop").equals(pressedButton)) {
             destroyMenu(false);
             return;
-        }else{
+        } else {
             return;
         }
         event.deferEdit().queue();
@@ -62,9 +61,9 @@ public class EmbedPaginator extends PaginatorBase {
 
     @Override
     protected void showPage() {
-        if(isCommand){
+        if (isCommand) {
             commandEvent.getHook().editOriginalComponents().setEmbeds(embedList.get(currentPage)).setActionRow(buttonList).queue();
-        }else{
+        } else {
             message.editMessageEmbeds(embedList.get(currentPage)).setActionRow(buttonList).queue();
         }
     }
@@ -74,6 +73,7 @@ public class EmbedPaginator extends PaginatorBase {
 
         /**
          * Builds the paginator. This method will throw an IllegalArgumentException if the paginator is not valid.
+         *
          * @return A new EmbedPaginator object.
          */
         @Override
@@ -99,6 +99,7 @@ public class EmbedPaginator extends PaginatorBase {
         /**
          * Allows for a List to be added to the list of embeds to be paginated. Any previously added lists or embeds will
          * be preserved so this method can be called multiple times to add different lists of embeds.
+         *
          * @param embedList The List of MessageEmbed objects that you wish to add to the paginator.
          * @return This builder.
          */
@@ -111,10 +112,11 @@ public class EmbedPaginator extends PaginatorBase {
          * Allows for an embed to be added to the list of embeds to be paginated. Any previously added lists or embeds will
          * be preserved so this method can be called multiple times to add many embeds. Please consider adding a large number
          * of embeds via a List via {@link #setEmbeds(List)}
-         * @param embed
-         * @return
+         *
+         * @param embed A {@link MessageEmbed} object to add to the paginator
+         * @return This Builder.
          */
-        public EmbedPaginator.Builder setEmbeds(MessageEmbed embed){
+        public EmbedPaginator.Builder setEmbeds(MessageEmbed embed) {
             this.embedList.add(embed);
             return this;
         }

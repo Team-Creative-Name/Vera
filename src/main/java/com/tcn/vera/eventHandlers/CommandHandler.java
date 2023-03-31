@@ -127,7 +127,7 @@ public class CommandHandler extends ListenerAdapter {
             }
 
             //aside from splitting our types out, we also need to put all buttons into their cache
-            if(command instanceof ButtonInterface buttonInterface){
+            if (command instanceof ButtonInterface buttonInterface) {
                 buttonHandler.registerButtonSet(buttonInterface.getButtonClassID(), buttonInterface::executeButton);
             }
         }
@@ -147,6 +147,7 @@ public class CommandHandler extends ListenerAdapter {
         messageContextCommandSet.forEach(c -> toAdd.add(c.getMessageContextCommand()));
 
         event.getJDA().updateCommands().addCommands(toAdd).queue();
+
         logger.info("Sent " + slashCommandSet.size() + " slash command(s), " +
                 userContextCommandSet.size() + " user context command(s), and " +
                 messageContextCommandSet.size() + " message context command(s) to Discord.");
@@ -211,7 +212,7 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        if(buttonHandler != null){
+        if (buttonHandler != null) {
             executeButtonInteraction(event);
         }
     }
@@ -380,8 +381,8 @@ public class CommandHandler extends ListenerAdapter {
     private void executeButtonInteraction(ButtonInteractionEvent event) {
         this.commandPool.submit(() -> {
             try {
-               buttonHandler.onEvent(event);
-            }catch (final Exception e) {
+                buttonHandler.onEvent(event);
+            } catch (final Exception e) {
                 logger.error("Button interaction failed! Button ID: " + event.getId());
             }
         });

@@ -66,11 +66,6 @@ public class CommandCache<K, V> {
         currIndex = (currIndex + 1) % keys.length;
     }
 
-    public void remove(K key) {
-        if (!contains(key)) {
-        }
-    }
-
     public boolean contains(K key) {
         return map.containsKey(key);
     }

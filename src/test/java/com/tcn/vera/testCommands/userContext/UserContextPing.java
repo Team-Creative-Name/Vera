@@ -39,6 +39,5 @@ public class UserContextPing extends UserContextTemplate{
     @Override
     public void executeUserContextCommand(UserContextInteractionEvent event) {
         event.reply(event.getTargetMember().getAsMention()).queue();
-        System.out.println("test");
     }
 }

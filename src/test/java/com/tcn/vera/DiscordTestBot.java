@@ -73,7 +73,6 @@ public class DiscordTestBot {
 
         discordBot.addEventListener(veraHandler);
 
-        System.out.println("All ready");
     }
 
 }

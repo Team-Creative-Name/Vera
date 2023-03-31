@@ -66,7 +66,6 @@ import java.util.Objects;
  *         this.slashCommand = Commands.slash(getCommandName(), getCommandHelp());
  *     }
  * </pre></blockquote>
- *
  */
 public abstract class SlashCommandTemplate extends CommandTemplateBase {
 

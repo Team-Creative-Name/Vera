@@ -34,7 +34,6 @@ package com.tcn.vera.commands.templates;
  * Unless you are attempting to define a custom command type, there should be no reason for you to extend this class. If you
  * are adding a custom command type, feel free to make a pull request on our github repository, and we will consider adding it to the
  * built-in command types.
- *
  */
 public abstract class CommandTemplateBase {
 

@@ -34,7 +34,7 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
  * This interface allows the addition of autocomplete interactions to a slash command. Because only the slash command
  * can use autocomplete, implementing this in any class other than ones extending {@link SlashCommandTemplate}
  * will have no effect.
- *
+ * <p>
  * For more information on handling autocomplete interactions, see the
  * <a href="https://jda.wiki/using-jda/interactions/#slash-command-autocomplete">JDA wiki on autocomplete interactions</a>
  */

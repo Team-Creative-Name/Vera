@@ -124,8 +124,7 @@ public abstract class ChatCommandTemplate extends CommandTemplateBase {
      * in this list. If no aliases are set, then this list will be empty. If you need a full list of every name, please use
      * {@link #getAllCommandNames()}.
      *
-     * @return
-     *    A list of all the alternate names that can be used to invoke this command.
+     * @return A list of all the alternate names that can be used to invoke this command.
      */
     public String[] getAliases() {
         return aliases;
@@ -135,8 +134,7 @@ public abstract class ChatCommandTemplate extends CommandTemplateBase {
      * A list of all the names that can be used to invoke this command. This list includes the command name set in the constructor.
      * If no aliases are set, then this list will only contain the command name.
      *
-     * @return
-     *  A list of all the names that can be used to invoke this command.
+     * @return A list of all the names that can be used to invoke this command.
      */
     public List<String> getAllCommandNames() {
         ArrayList<String> array = new ArrayList<>(Arrays.asList(getAliases()));

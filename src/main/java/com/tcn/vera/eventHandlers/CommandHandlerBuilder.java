@@ -56,7 +56,7 @@ public class CommandHandlerBuilder {
 
         if (prefix.length() > 1 || prefix.equalsIgnoreCase(" ")) {
             throw new IllegalArgumentException("The prefix cannot be longer than one character and cannot be a blank space." +
-                    "Please modify the prefix given to the changePrefix method. This commandhandler will not be built");
+                    "Please modify the prefix given to the changePrefix method. This commandHandler will not be built");
         }
 
         for (CommandTemplateBase command : commandList) {
@@ -68,7 +68,7 @@ public class CommandHandlerBuilder {
             }
         }
 
-        if(buttonHandler == null){
+        if (buttonHandler == null) {
             LoggerFactory.getLogger("Vera: Command Handler").warn("No button handler was provided to the command handler. " +
                     "If you want to use buttons, please provide a button handler to the command handler builder via the addButtonHandler method.");
             buttonHandler = new ButtonHandler();
@@ -125,6 +125,7 @@ public class CommandHandlerBuilder {
      * Adds a button handler to the command handler. This is required if you want to use buttons.
      * <p>
      * Only the last button handler added will be used.
+     *
      * @param buttonHandler The button handler you want to use for all of your buttons.
      * @return This Builder
      */
