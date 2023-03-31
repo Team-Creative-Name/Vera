@@ -60,7 +60,7 @@ public class ModalSlashCommand extends SlashCommandTemplate implements ModalInte
                 .setMaxLength(2)
                 .build();
         responseModal = Modal.create("foodPicker", "What is your favorite food?")
-                .addActionRows(ActionRow.of(name), ActionRow.of(favoriteFood)).build();
+                .addComponents(ActionRow.of(name), ActionRow.of(favoriteFood)).build();
 
     }
 
