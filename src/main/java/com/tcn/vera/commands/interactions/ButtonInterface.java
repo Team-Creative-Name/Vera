@@ -30,20 +30,41 @@ package com.tcn.vera.commands.interactions;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 /**
- * This interface allows the addition of buttons to a slash command. Both chat and slash commands should be able to use
- * buttons.
+ * This interface allows the addition of buttons to a {@link com.tcn.vera.commands.templates.SlashCommandTemplate Slash Command}
+ * or a {@link com.tcn.vera.commands.templates.ChatCommandTemplate Chat Command}.
  */
 public interface ButtonInterface {
 
     /**
-     * The code executed when the user presses a button.
+     * The code to be executed when the user presses a button. Every button defined by the command should be handled here.
+     * <br><br>
+     * Vera provides a {@link com.tcn.vera.utils.VeraUtils#getButtonName(ButtonInteractionEvent)} function that can be used to
+     * determine the name of the button that was pressed.
+     * <br><br>
+     * We recommend using something similar to the following code:
+     * <blockquote><pre>
+     *     public void executeButton(ButtonInteractionEvent event) {
+     *
+     *         event.deferEdit().queue();
+     *
+     *         switch (VeraUtils.getButtonName(event)) {
+     *             case "buttonOne" -> {
+     *                 event.getMessage().editMessage("You pressed the first button!").setComponents().queue();
+     *             }
+     *             case "buttonTwo" -> {
+     *                 event.getMessage().editMessage("You pressed the second button").setComponents().queue();
+     *             }
+     *         }
+     *     }
+     *   </pre></blockquote>
      *
      * @param event The {@link ButtonInteractionEvent} sent by discord
      */
     void executeButton(ButtonInteractionEvent event);
 
     /**
-     * The class ID of the button. This is used to identify which button was pressed.
+     * The class ID of the button used to identify which class registered the command. This string must be unique
+     * to each command but has no other requirements. We recommend using the name of the class.
      *
      * @return The class ID of the button
      */

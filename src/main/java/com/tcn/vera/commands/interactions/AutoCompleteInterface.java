@@ -34,13 +34,20 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
  * This interface allows the addition of autocomplete interactions to a slash command. Because only the slash command
  * can use autocomplete, implementing this in any class other than ones extending {@link SlashCommandTemplate}
  * will have no effect.
+ *
+ * For more information on handling autocomplete interactions, see the
+ * <a href="https://jda.wiki/using-jda/interactions/#slash-command-autocomplete">JDA wiki on autocomplete interactions</a>
  */
 public interface AutoCompleteInterface {
 
     /**
-     * The code executed when the user attempts to autofill a slash command.
+     * The code executed when the user attempts to fill in a slash command.
+     * You can send choices via <pre>event.replyChoices().queue();</pre> but please know that you can send a maximum of
+     * 25 choices per interaction.
      *
      * @param event The {@link CommandAutoCompleteInteractionEvent} sent by discord
+     * @implNote This method is called almost every time a user types a character in a slash command. Do not do anything
+     * expensive in this method.
      */
     void executeAutocomplete(CommandAutoCompleteInteractionEvent event);
 

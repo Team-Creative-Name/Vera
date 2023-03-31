@@ -67,8 +67,6 @@ import java.util.Objects;
  *     }
  * </pre></blockquote>
  *
- * @author Thomas Wessel
- * @since 1.0
  */
 public abstract class SlashCommandTemplate extends CommandTemplateBase {
 
@@ -83,7 +81,7 @@ public abstract class SlashCommandTemplate extends CommandTemplateBase {
     }
 
     /**
-     * The entrypoint into your command.
+     * The entrypoint into your command. Place any code that you want to execute when the command is called here.
      *
      * @param event The {@link SlashCommandInteractionEvent} which caused the command to be executed.
      */

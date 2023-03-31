@@ -35,8 +35,6 @@ import javax.annotation.Nonnull;
  * implement any methods that the default command template for that type does. For example, a class marked with the {@link CommandType#CHAT_COMMAND}
  * type should either extend or reimplement everything found in {@link ChatCommandTemplate}.
  *
- * @author Thomas Wessel
- * @since 1.0
  */
 public enum CommandType {
 

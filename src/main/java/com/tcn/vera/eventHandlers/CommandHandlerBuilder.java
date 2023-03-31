@@ -121,6 +121,13 @@ public class CommandHandlerBuilder {
         return this;
     }
 
+    /**
+     * Adds a button handler to the command handler. This is required if you want to use buttons.
+     * <p>
+     * Only the last button handler added will be used.
+     * @param buttonHandler The button handler you want to use for all of your buttons.
+     * @return This Builder
+     */
     public CommandHandlerBuilder addButtonHandler(ButtonHandler buttonHandler) {
         this.buttonHandler = buttonHandler;
         return this;

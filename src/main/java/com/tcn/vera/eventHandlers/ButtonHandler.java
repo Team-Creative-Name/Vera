@@ -27,6 +27,7 @@
  */
 package com.tcn.vera.eventHandlers;
 
+import com.tcn.vera.commands.interactions.ButtonInterface;
 import com.tcn.vera.utils.CommandCache;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
@@ -34,7 +35,13 @@ import java.util.EventListener;
 import java.util.function.Consumer;
 
 /**
- * Vera Button Handler. This class is used to handle all button interactions. Please do not use this class directly.
+ * The Button handler for Vera. It is recommended that you only use one instance of this class per bot. If you have ANY commands that
+ * use buttons, you MUST set an instance of this class in {@link CommandHandlerBuilder#addButtonHandler(ButtonHandler)} so it can
+ * properly register your buttons and handle any presses.
+ * <p>
+ * If you are using any of Vera's paginator classes, you must pass the same instance of this class to the paginator, so it can properly register itself.
+ *
+ * @implNote By default, this class has a cache size of 100. If you need to support more buttons at a time, please use {@link #ButtonHandler(int cacheSize)}.
  */
 public class ButtonHandler implements EventListener {
     int cacheSize = 100;
@@ -47,7 +54,8 @@ public class ButtonHandler implements EventListener {
     }
 
     /**
-     * Creates a new ButtonHandler with a desired cache size.
+     * Creates a new ButtonHandler with a custom cache size.
+     * @param cacheSize The maximum number of buttons that can be registered at a time. If more buttons are registered, the oldest button will be removed.
      */
     public ButtonHandler(int cacheSize) {
         this.cacheSize = cacheSize;
@@ -55,6 +63,10 @@ public class ButtonHandler implements EventListener {
 
     private final CommandCache<String, Consumer<? super ButtonInteractionEvent>> listeners = new CommandCache<>(cacheSize);
 
+    /**
+     * This method is called when a button is pressed. It will check if the button is registered, and if it is, it will call the callback.
+     * @param event The {@link ButtonInteractionEvent} that was fired.
+     */
     public void onEvent(ButtonInteractionEvent event) {
         Consumer<? super ButtonInteractionEvent> callback = listeners.find(prefix -> event.getComponentId().startsWith(prefix));
 
@@ -65,6 +77,11 @@ public class ButtonHandler implements EventListener {
         }
     }
 
+    /**
+     * Registers a button with a callback. The callback will be called when the button is pressed.
+     * @param prefix The prefix of the button. This is used to identify the button. The prefix should be the value set in {@link ButtonInterface#getButtonClassID()}.
+     * @param callback The callback to call when the button is pressed.
+     */
     public void registerButtonSet(String prefix, Consumer<? super ButtonInteractionEvent> callback) {
         listeners.add(prefix, callback);
     }

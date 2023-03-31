@@ -70,9 +70,12 @@ public class EmbedPaginator extends PaginatorBase {
     }
 
     public static class Builder extends PaginatorBase.Builder<EmbedPaginator.Builder, EmbedPaginator> {
-        private int numOfPages;
         private final List<MessageEmbed> embedList = new ArrayList<>();
 
+        /**
+         * Builds the paginator. This method will throw an IllegalArgumentException if the paginator is not valid.
+         * @return A new EmbedPaginator object.
+         */
         @Override
         public EmbedPaginator build() {
             //validate stuff
@@ -81,8 +84,7 @@ public class EmbedPaginator extends PaginatorBase {
             }
 
             //calculate the number of pages
-            numOfPages = embedList.size();
-            return new EmbedPaginator(message, commandEvent, numOfPages, shouldWrap, userID, (ArrayList<MessageEmbed>) embedList, buttonHandler);
+            return new EmbedPaginator(message, commandEvent, embedList.size(), shouldWrap, userID, (ArrayList<MessageEmbed>) embedList, buttonHandler);
         }
 
         @Override

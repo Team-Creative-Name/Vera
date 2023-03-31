@@ -68,8 +68,6 @@ import java.util.Objects;
  *     }
  * </pre></blockquote>
  *
- * @author Thomas Wessel
- * @since 1.0
  */
 public abstract class UserContextTemplate extends CommandTemplateBase {
 
@@ -84,7 +82,7 @@ public abstract class UserContextTemplate extends CommandTemplateBase {
     }
 
     /**
-     * The entrypoint into your command.
+     * The entrypoint into your command. Place any code that you want to execute when the command is called here.
      *
      * @param event The {@link UserContextInteractionEvent} which caused the command to be executed.
      */

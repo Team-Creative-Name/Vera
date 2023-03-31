@@ -68,8 +68,6 @@ import java.util.Objects;
  *     }
  * </pre></blockquote>
  *
- * @author Thomas Wessel
- * @since 1.0
  */
 public abstract class MessageContextTemplate extends CommandTemplateBase {
 
@@ -84,7 +82,7 @@ public abstract class MessageContextTemplate extends CommandTemplateBase {
     }
 
     /**
-     * The entrypoint into your command.
+     * The entrypoint into your command. Any code that you want to execute when the command is called should be placed here.
      *
      * @param event The {@link MessageContextInteractionEvent} which caused the command to be executed.
      */

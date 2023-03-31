@@ -31,10 +31,10 @@ package com.tcn.vera.commands.templates;
  * A common parent for every command template class. This class defines features that every command template must support
  * in order for the {@link com.tcn.vera.eventHandlers.CommandHandler} to be able to use it.
  * <p>
- * Unless the user is attempting to define a custom command type, there should be no reason for them to extend this class.
+ * Unless you are attempting to define a custom command type, there should be no reason for you to extend this class. If you
+ * are adding a custom command type, feel free to make a pull request on our github repository, and we will consider adding it to the
+ * built-in command types.
  *
- * @author Thomas Wessel
- * @since 1.0
  */
 public abstract class CommandTemplateBase {
 
@@ -44,6 +44,7 @@ public abstract class CommandTemplateBase {
      * that the command supports.
      */
     protected final CommandType commandType;
+
     /**
      * The name of the command. Unless overridden, this is what the command template will use as the invocation method for
      * your command.
@@ -58,6 +59,7 @@ public abstract class CommandTemplateBase {
      * the <a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object">Discord docs on Application Command Naming</a>
      */
     protected String commandName = "command";
+
     /**
      * This string is used as the general description of the command. If this command is something that discord shows a description
      * near such as a context or slash command, it will appear there if you use the default command builder. This string is also presented

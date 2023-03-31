@@ -49,7 +49,7 @@ public interface ModalInterface {
      * If your command fails to complete execution (crashes), Vera will attempt to handle the event to ensure that the user is not
      * stuck with a broken modal.
      */
-    public void executeModal(ModalInteractionEvent event);
+    void executeModal(ModalInteractionEvent event);
 
     /**
      * In order for the {@link com.tcn.vera.eventHandlers.CommandHandler} to match a modal event to this command, it must
@@ -60,6 +60,6 @@ public interface ModalInterface {
      *
      * @return The modal sent to discord as a reply
      */
-    public Modal getModal();
+    Modal getModal();
 
 }

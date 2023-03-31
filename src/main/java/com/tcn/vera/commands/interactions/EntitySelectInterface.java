@@ -35,13 +35,20 @@ import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 
 /**
  * This interface allows for the Vera Command Handler to send entity select interactions to your command. This interface only works for
- * {@link SlashCommandTemplate},
- * {@link UserContextTemplate}, and {@link MessageContextTemplate} command templates.
+ * {@link SlashCommandTemplate Slash Command},
+ * {@link UserContextTemplate User Context}, and {@link MessageContextTemplate Message Context} command templates.
+ * <p>
+ * To use this interface, send a {@link EntitySelectMenu} to discord as a reply to the original command's interaction event. Then, ensure that the
+ * {@link EntitySelectInterface#getMenu()} method returns the same menu that you sent to discord. You can then use the
+ * {@link EntitySelectInterface#executeEntitySelectInteraction(EntitySelectInteractionEvent)}
+ * to execute code when the user selects an entity.
  */
 public interface EntitySelectInterface {
 
     /**
      * The code executed when discord fires the {@link EntitySelectInteractionEvent} event related to this command.
+     * <p>
+     * Any code that you want to execute when the user selects an entity should be placed here.
      *
      * @param event The event that contains the user's selection.
      */

@@ -65,7 +65,6 @@ public class AutocompleteSlashCommand extends SlashCommandTemplate implements Au
                     .filter(word -> word.startsWith(event.getFocusedOption().getValue())) // only display words that start with the user's current input
                     .map(word -> new Command.Choice(word, word)) // map the words to choices
                     .collect(Collectors.toList());
-            System.out.println("test");
             event.replyChoices(options).queue();
         }
     }

@@ -31,8 +31,15 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 /**
- * This interface allows for your command to handle string select interactions. This interface is only useful on slash and
- * context commands
+ * This interface allows for your command to handle string select interactions. This interface is only useful on
+ * {@link com.tcn.vera.commands.templates.SlashCommandTemplate Slash Command},
+ * {@link com.tcn.vera.commands.templates.MessageContextTemplate Message Context} and
+ * {@link com.tcn.vera.commands.templates.UserContextTemplate User Context} command templates.
+ * <p>
+ * To use this interface, send a {@link StringSelectMenu} to discord as a reply to the original command's interaction event. Then, ensure that the
+ * {@link StringSelectInterface#getMenu()} method returns the same menu that you sent to discord. You can then use the
+ * {@link StringSelectInterface#executeStringSelectInteraction(StringSelectInteractionEvent)}
+ * to execute code when the user selects a string.
  */
 public interface StringSelectInterface {
 

@@ -55,7 +55,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * The command handler for Vera. This class must be constructed via the CommandHandlerBuilder.
+ * The command handler for Vera.
+ * <p>
+ * It is recommended that you only have one instance of this class per bot. This class automatically registers all commands and
+ * will therefore overwrite any commands it is not aware of.
+ * <p>
+ * To create an instance of this class, please use the {@link CommandHandlerBuilder}.
  */
 public class CommandHandler extends ListenerAdapter {
 

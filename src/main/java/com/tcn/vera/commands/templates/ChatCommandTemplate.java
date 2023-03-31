@@ -67,9 +67,6 @@ import java.util.List;
  *         this.isOwnerCommand = false;
  *     }
  * </pre></blockquote>
- *
- * @author Thomas Wessel
- * @since 1.0
  */
 public abstract class ChatCommandTemplate extends CommandTemplateBase {
 
@@ -122,10 +119,25 @@ public abstract class ChatCommandTemplate extends CommandTemplateBase {
         return isOwnerCommand;
     }
 
+    /**
+     * A list of all the names that can be used to invoke this command. The command name set in the constructor is not included
+     * in this list. If no aliases are set, then this list will be empty. If you need a full list of every name, please use
+     * {@link #getAllCommandNames()}.
+     *
+     * @return
+     *    A list of all the alternate names that can be used to invoke this command.
+     */
     public String[] getAliases() {
         return aliases;
     }
 
+    /**
+     * A list of all the names that can be used to invoke this command. This list includes the command name set in the constructor.
+     * If no aliases are set, then this list will only contain the command name.
+     *
+     * @return
+     *  A list of all the names that can be used to invoke this command.
+     */
     public List<String> getAllCommandNames() {
         ArrayList<String> array = new ArrayList<>(Arrays.asList(getAliases()));
         array.add(getCommandName());

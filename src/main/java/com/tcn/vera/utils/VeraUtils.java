@@ -34,12 +34,12 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * A collection of static methods used internally for Vera.
+ * A collection of static methods used internally for Vera. In some cases, these methods may be useful for bot developers.
  */
 public class VeraUtils {
 
     private VeraUtils() {
-        throw new IllegalStateException("This is a utility class! Don't try to make a class out of it!");
+        throw new IllegalStateException("This is a utility class! Don't try to make a object out of it!");
     }
 
     public static ThreadFactory createThreadFactory(String threadName, Logger logger, boolean isDaemon) {
@@ -82,6 +82,11 @@ public class VeraUtils {
         }
     }
 
+    /**
+     * Takes in a full button ID string and strips it of the button ID context. This is useful for getting the name of a button.
+     * @param buttonID The full button ID string you want to get the name of.
+     * @return A string containing just the name of the button. (hopefully)
+     */
     public static String getButtonName(String buttonID){
         if(buttonID != null && (buttonID.lastIndexOf(':') != buttonID.length() - 1)){
             return buttonID.substring(buttonID.lastIndexOf(':') + 1);
@@ -89,6 +94,11 @@ public class VeraUtils {
         return " ";
     }
 
+    /**
+     * Calls {@link #getButtonName(String)} with the button ID from the provided {@link ButtonInteractionEvent}.
+     * @param event the event to get the button name from.
+     * @return A string containing just the name of the button. (hopefully)
+     */
     public static String getButtonName(ButtonInteractionEvent event){
        return getButtonName(event.getButton().getId());
     }

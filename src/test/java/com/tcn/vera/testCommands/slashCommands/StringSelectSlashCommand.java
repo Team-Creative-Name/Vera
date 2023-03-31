@@ -51,7 +51,7 @@ public class StringSelectSlashCommand extends SlashCommandTemplate implements St
 
     @Override
     public void executeStringSelectInteraction(StringSelectInteractionEvent event) {
-        event.reply("You chose: " + event.getInteraction().toString()).queue();
+        event.reply("You chose: " + event.getInteraction()).queue();
     }
 
     @Override
