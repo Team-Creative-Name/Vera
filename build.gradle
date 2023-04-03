@@ -1,7 +1,6 @@
-
-
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
 repositories {
@@ -24,5 +23,20 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.tcn'
+            artifactId = 'Vera'
+            version = "1.0.0.Beta.1"
+            from components.java
+
+            pom {
+                description = 'A Discord library for TCN'
+            }
+        }
+    }
 }
 
