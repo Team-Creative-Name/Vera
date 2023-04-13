@@ -32,6 +32,8 @@ import com.tcn.vera.eventHandlers.CommandHandler;
 import com.tcn.vera.eventHandlers.CommandHandlerBuilder;
 import com.tcn.vera.testCommands.chatCommands.BasicChatCommand;
 import com.tcn.vera.testCommands.messageContext.BasicMessageContextCommand;
+import com.tcn.vera.testCommands.paginatorCommands.AdvancedPaginatorCommand;
+import com.tcn.vera.testCommands.paginatorCommands.AdvancedPaginatorMessage;
 import com.tcn.vera.testCommands.paginatorCommands.EmbedPaginatorCommand;
 import com.tcn.vera.testCommands.paginatorCommands.EmbedPaginatorMessage;
 import com.tcn.vera.testCommands.slashCommands.*;
@@ -66,6 +68,8 @@ public class DiscordTestBot {
                 .addCommand(new ButtonSlashCommand())
                 .addCommand(new EmbedPaginatorCommand(buttonHandler))
                 .addCommand(new EmbedPaginatorMessage(buttonHandler))
+                .addCommand(new AdvancedPaginatorCommand(buttonHandler))
+                .addCommand(new AdvancedPaginatorMessage(buttonHandler))
                 .changePrefix("!")
                 .addButtonHandler(buttonHandler)
                 .build();

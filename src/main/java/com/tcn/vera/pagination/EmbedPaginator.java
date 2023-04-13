@@ -1,3 +1,30 @@
+/*
+ * Vera - a common library for all of TCN's discord bots.
+ *
+ * Copyright (C) 2022-23 Thomas Wessel and the rest of Team Creative Name
+ *
+ *
+ * This library is licensed under the GNU Lesser General Public License v2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ * USA
+ *
+ *
+ * For more information, please check out the original repository of this project on github
+ * https://github.com/Team-Creative-Name/Vera
+ */
 package com.tcn.vera.pagination;
 
 import com.tcn.vera.eventHandlers.ButtonHandler;
@@ -14,8 +41,7 @@ import java.util.List;
 /**
  * A class that allows for pagination of an array of embeds. This very simple version of the Vera paginator is
  * incapable of dynamically generating pages. If you need a paginator that has dynamic page loading or other advanced feature,
- * please see
- * //TODO: Add a paginator with advanced features like the one that this very javadoc talks about.
+ * please see {@link com.tcn.vera.pagination.AdvancedEmbedPaginator}.
  */
 public class EmbedPaginator extends PaginatorBase {
 
@@ -28,16 +54,14 @@ public class EmbedPaginator extends PaginatorBase {
 
         if (numberOfPages > 1) {
             //left, stop, right buttons
-            addButton(Button.primary(getFullButtonID("previous"), "◀️ Go Left"));
+            addButton(Button.primary(getFullButtonID("previous"), Emoji.fromUnicode("\u2B05")));
             addButton(Button.danger(getFullButtonID("stop"), Emoji.fromUnicode("\uD83D\uDDD1️")));
-            addButton(Button.primary(getFullButtonID("next"), "Go Right ▶️️"));
+            addButton(Button.primary(getFullButtonID("next"), Emoji.fromUnicode("\u27A1")));
         }
-
-
     }
 
     @Override
-    public void onButtonClick(ButtonInteractionEvent event) {
+    protected void onButtonClick(ButtonInteractionEvent event) {
         if (event.getUser().getIdLong() != userID) {
             event.reply("You are not the user who created this menu!").setEphemeral(true).queue();
             return;
@@ -64,7 +88,11 @@ public class EmbedPaginator extends PaginatorBase {
         if (isCommand) {
             commandEvent.getHook().editOriginalComponents().setEmbeds(embedList.get(currentPage)).setActionRow(buttonList).queue();
         } else {
-            message.editMessageEmbeds(embedList.get(currentPage)).setActionRow(buttonList).queue();
+            if(sentMessage == null){
+                sentMessage = message.getChannel().sendMessageEmbeds(embedList.get(currentPage)).setActionRow(buttonList).complete();
+            }else{
+                sentMessage.editMessageEmbeds(embedList.get(currentPage)).setActionRow(buttonList).queue();
+            }
         }
     }
 

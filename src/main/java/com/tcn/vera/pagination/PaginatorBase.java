@@ -1,3 +1,30 @@
+/*
+ * Vera - a common library for all of TCN's discord bots.
+ *
+ * Copyright (C) 2022-23 Thomas Wessel and the rest of Team Creative Name
+ *
+ *
+ * This library is licensed under the GNU Lesser General Public License v2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ * USA
+ *
+ *
+ * For more information, please check out the original repository of this project on github
+ * https://github.com/Team-Creative-Name/Vera
+ */
 package com.tcn.vera.pagination;
 
 import com.tcn.vera.eventHandlers.ButtonHandler;
@@ -18,6 +45,8 @@ import java.util.List;
 public abstract class PaginatorBase {
 
     protected final Message message;
+    protected Message sentMessage = null;
+
     protected final SlashCommandInteractionEvent commandEvent;
     protected final long userID;
 
@@ -55,7 +84,7 @@ public abstract class PaginatorBase {
      *
      * @param event The {@link ButtonInteractionEvent} that was fired.
      */
-    public abstract void onButtonClick(ButtonInteractionEvent event);
+    protected abstract void onButtonClick(ButtonInteractionEvent event);
 
     /**
      * The method called when a page is shown. This method should be overridden by the child class.
@@ -91,12 +120,14 @@ public abstract class PaginatorBase {
      * @return A String representing the ID of the button. This should be used as the first parameter when creating a button.
      */
     public String getFullButtonID(String buttonName) {
-        if (isCommand) {
-            return commandEvent.getHook().retrieveOriginal().complete().getId() + ":" + userID + ":" + buttonName;
-        }
-        return message.getId() + ":" + userID + ":" + buttonName;
+        return getButtonID() + ":" + buttonName;
     }
 
+    /**
+     * Used to generate the base ID of a button via the message ID and the discord user ID.
+     *
+     * @return A string representing the base ID of the button.
+     */
     public String getButtonID() {
         if (isCommand) {
             return commandEvent.getHook().retrieveOriginal().complete().getId() + ":" + userID;
@@ -104,19 +135,43 @@ public abstract class PaginatorBase {
         return message.getId() + ":" + userID;
     }
 
-    protected void incPageNum() {
+    /**
+     * Calculates the next page number. Returns -1 if there is no next page.
+     * @return The next page number
+     */
+    protected int getNextPageNum(){
         if (currentPage == numberOfPages - 1 && shouldWrap) {
-            currentPage = 0;
+            return 0;
         } else if (currentPage < numberOfPages - 1) {
-            currentPage++;
+            return currentPage + 1;
+        } else {
+            return -1;
+        }
+    }
+
+    protected void incPageNum() {
+        if(getNextPageNum() != -1){
+            currentPage = getNextPageNum();
+        }
+    }
+
+    /**
+     * Calculates the previous page number. Returns -1 if there is no previous
+     * @return The previous page number.
+     */
+    protected int getPreviousPageNum(){
+        if (currentPage == 0 && shouldWrap) {
+            return numberOfPages - 1;
+        } else if (currentPage > 0) {
+            return currentPage - 1;
+        } else {
+            return -1;
         }
     }
 
     protected void decPageNum() {
-        if (currentPage == 0 && shouldWrap) {
-            currentPage = numberOfPages - 1;
-        } else if (currentPage > 0) {
-            currentPage--;
+        if(getPreviousPageNum() != -1){
+            currentPage = getPreviousPageNum();
         }
     }
 
@@ -142,13 +197,14 @@ public abstract class PaginatorBase {
     protected void destroyMenu(boolean deleteMessage) {
         if (deleteMessage && isCommand) {
             commandEvent.getHook().deleteOriginal().queue();
-        } else if (deleteMessage) {
-            message.delete().queue();
+        } else if (deleteMessage && sentMessage != null) {
+            sentMessage.delete().queue();
         } else if (isCommand) {
             commandEvent.getHook().editOriginalComponents().setComponents().queue();
-        } else {
-            message.editMessageComponents().setComponents().queue();
+        } else if (sentMessage != null) {
+            sentMessage.editMessageComponents().setComponents().queue();
         }
+        //if there is no sent message there is no message to delete
     }
 
     @SuppressWarnings("unchecked")
