@@ -37,12 +37,17 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
- * Advanced Embed paginator. A class that allows for more advanced pagination of embeds. This version supports dynamic page loading,
- * and the ability to show a submenu.
+ * A Pagainator that is capable of displaying embeds in a more advanced way than the {@link EmbedPaginator}. This paginator
+ * allows for dynamic content loading, page caching, and the ability to add a select button which can be used to do anything
+ * via a consumer.
+ * <p>
+ * While the constructor is public, it is recommended that you use the {@link AdvancedEmbedPaginator.Builder} to build this
+ * paginator as it is quite complex and has many options. For more information on how to construct this paginator, please
+ * see the builder's javadoc.
  */
 public class AdvancedEmbedPaginator extends PaginatorBase{
 
@@ -57,6 +62,9 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
 
     /**
      * Please consider using the AdvancedEmbedPaginatorBuilder to build this object.
+     * <p>
+     * This paginator is capable of being used with both slash commands and message commands.
+     *
      * @param message The message that the paginator is going to modify. Null if this is a slash command.
      * @param commandEvent The commandEvent that the paginator is responding to. Null if this is a message command.
      * @param numberOfPages The number of pages that are in your paginator.
@@ -68,12 +76,13 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
      * @param eventSelectConsumer A consumer that is executed when the 'select' button is pressed on a page of the paginator and the paginator is using a slash command.
      * @param messageSelectConsumer A consumer that is executed when the 'select' button is pressed on a page of the paginator and the paginator is using a chat command.
      */
-    protected AdvancedEmbedPaginator(Message message, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler, ArrayList<Object> pageDataList, BiConsumer<EmbedBuilder, Object> pageBuilder, BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer, BiConsumer<Message, Object> messageSelectConsumer){
+    protected AdvancedEmbedPaginator(Message message, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler, ArrayList<Object> pageDataList, ArrayList<MessageEmbed> embedList, BiConsumer<EmbedBuilder, Object> pageBuilder, BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer, BiConsumer<Message, Object> messageSelectConsumer){
         super(message, commandEvent, numberOfPages, shouldWrap, userID, buttonHandler);
+
         this.pageDataList = pageDataList;
         this.eventSelectConsumer = eventSelectConsumer;
         this.messageSelectConsumer = messageSelectConsumer;
-        this.generatedEmbedList = new ArrayList<>(Arrays.asList(new MessageEmbed[numberOfPages]));
+        this.generatedEmbedList = embedList;
 
         embedConsumer = pageBuilder;
         hasSelectButton = eventSelectConsumer != null || messageSelectConsumer != null;
@@ -97,6 +106,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
             return;
         }
 
+        event.deferEdit().queue();
+
         switch (event.getComponentId().split(":")[2]) {
             case "previous" -> decPageNum();
             case "next" -> incPageNum();
@@ -105,14 +116,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
                 return;
             }
             case "success" -> {
-                event.deferEdit().queue();
-                if (hasSelectButton) {
-                    if (isCommand) {
-                        eventSelectConsumer.accept(commandEvent, pageDataList.get(currentPage));
-                    } else {
-                        messageSelectConsumer.accept(sentMessage, pageDataList.get(currentPage));
-                    }
-                }
+                enterSubMenu();
                 //we don't want to continue this paginator after the user has selected something. return
                 return;
             }
@@ -121,7 +125,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
             }
         }
 
-        event.deferEdit().queue();
+
         showPage();
 
         //now we need to ensure the next pages are generated
@@ -132,6 +136,23 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
             getMenuEmbed(getPreviousPageNum());
         }
 
+    }
+
+    private void enterSubMenu(){
+        //depending on how this page was created, we either need to send a embedBuilder or the pageData object
+        Object toSend;
+        if(pageDataList.get(currentPage) == null){
+            toSend = getMenuEmbed(currentPage);
+        } else {
+            toSend = pageDataList.get(currentPage);
+        }
+        if (hasSelectButton) {
+            if (isCommand) {
+                eventSelectConsumer.accept(commandEvent, toSend);
+            } else {
+                messageSelectConsumer.accept(sentMessage, toSend);
+            }
+        }
     }
 
     private MessageEmbed getMenuEmbed(int pagenum){
@@ -146,7 +167,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
             embedBuilder.setFooter("Page " + (pagenum + 1) + " of " + numberOfPages);
         }
 
-        generatedEmbedList.add(pagenum, embedBuilder.build());
+        generatedEmbedList.set(pagenum, embedBuilder.build());
 
         return embedBuilder.build();
     }
@@ -177,9 +198,24 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
         }
     }
 
+    /**
+     * The builder class for the AdvancedEmbedPaginator.
+     * <p>
+     * The advancedEmbedPaginator is a paginator that allows you to use a biconsumer to build your pages as they are needed instead of all at once.
+     * This is useful if you have a lot of pages or if the pages are costly to generate. Simply add your page data to the pageDataList via the {@link #addPageData(Object)} method
+     * and then whenever it is needed, the biconsumer will be called the page will be generated. This paginator attempts to keep at least one page ahead of the current page generated
+     * so a user never has to wait for a page to be generated.
+     * <p>
+     * Submenus are handled by biconsumers as well. If you want to use a submenu, you must pass in a biconsumer that will be executed when the user selects the page.
+     * These are type sensitive. Only pass a eventSelectConsumer if you are using a slash command, and only pass a messageSelectConsumer if you are using a chat command.
+     * Adding a submenu consumer will automatically add a select button to the paginator.
+     *
+     */
     public static class Builder extends PaginatorBase.Builder<AdvancedEmbedPaginator.Builder, AdvancedEmbedPaginator> {
         private BiConsumer<EmbedBuilder, Object> embedConsumer;
         private final ArrayList<Object> pageDataList = new ArrayList<>();
+
+        private final ArrayList<MessageEmbed> generatedEmbedList = new ArrayList<>();
 
         private BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer = null;
 
@@ -197,8 +233,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
                 throw new IllegalArgumentException("Cannot build, invalid arguments!");
             }
 
-            //calculate the number of pages
-            return new AdvancedEmbedPaginator(message, commandEvent, pageDataList.size(), shouldWrap, userID, buttonHandler,pageDataList, embedConsumer, eventSelectConsumer, messageSelectConsumer);
+            return new AdvancedEmbedPaginator(message, commandEvent, pageDataList.size(), shouldWrap, userID, buttonHandler, pageDataList, generatedEmbedList, embedConsumer, eventSelectConsumer, messageSelectConsumer);
         }
 
         @Override
@@ -220,28 +255,58 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
 
         /**
          * Adds an object to the pageData list. This function can be called multiple times to add multiple items to the list.
-         * If you want to add a large number of items, consider adding them as an arrayList instead with {@link AdvancedEmbedPaginator.Builder#addPageData(ArrayList pageDataArray)}
+         * If you want to add a large number of items, consider adding them as an arrayList instead with {@link AdvancedEmbedPaginator.Builder#addPageData(List pageDataArray)}
          * @param pageData The object you would like to add to the page data list
          * @return This Builder
          */
         public AdvancedEmbedPaginator.Builder addPageData(Object pageData){
             pageDataList.add(pageData);
+            //ensure the generated embed list is the same size as the pageDataList
+            generatedEmbedList.add(null);
             return this;
         }
 
         /**
-         * Adds an arrayList of objects to the pageData list. This function can be called multiple times to add multiple items to the list.
-         * @param pageData The arrayList you would like to add to the page data list.
+         * Adds a List of objects to the pageData list. This function can be called multiple times to add multiple items to the list.
+         * @param pageData The List you would like to add to the page data list.
          * @return This Builder.
          */
-        public AdvancedEmbedPaginator.Builder addPageData(ArrayList<Object> pageData){
+        public AdvancedEmbedPaginator.Builder addPageData(List<Object> pageData){
             pageDataList.add(pageData);
+            //ensure the generated embed list is the same size as the pageDataList
+            pageData.forEach(o -> generatedEmbedList.add(null));
+            return this;
+        }
+
+        /**
+         * Adds a messageEmbed to the next free spot in the page list.
+         * @param embed The pre-made embed you would like to add to the page list.
+         * @return This Builder.
+         */
+        public AdvancedEmbedPaginator.Builder addEmbed(MessageEmbed embed){
+            generatedEmbedList.add(embed);
+            //ensure that we dont overwrite any data in the pageDataList
+            pageDataList.add(null);
+            return this;
+        }
+
+        /**
+         * Adds a list of messageEmbeds to the next free spots in the page list.
+         * @param embeds The pre-made embeds you would like to add to the page list.
+         * @return This Builder.
+         */
+        public AdvancedEmbedPaginator.Builder addEmbeds(List<MessageEmbed> embeds){
+            generatedEmbedList.addAll(embeds);
+            //ensure that we dont overwrite any data in the pageDataList
+            embeds.forEach(o -> pageDataList.add(null));
             return this;
         }
 
 
         /**
          * Sets the embed consumer for the paginator. This is the function that will be called to generate the embeds for each page.
+         * <p>
+         * The consumer will be called once for each page and then the embed will be cached.
          * @param embedBuilder The embed consumer that will be used to generate the embeds for each page.
          * @return This Builder.
          */
@@ -254,6 +319,9 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
          * Sets the consumer that will be called when the user uses the select button on the paginator.
          * This consumer will only be called if the paginator is a command paginator.
          * Do not use this function if you are using a message paginator.
+         * <p>
+         * The second parameter of the consumer is the information that was passed in when the page was added. Example: If the page
+         * was originally added as a MessageEmbed, then you will get a MessageEmbed object back.
          *
          * @param eventSelectConsumer The consumer that will be called when the user selects the paginator.
          * @return This Builder.
@@ -267,6 +335,10 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
          * Sets the consumer that will be called when the user uses the select button on the paginator.
          * This consumer will only be called if the paginator is a message paginator.
          * Do not use this function if you are using a command paginator.
+         * <p>
+         * The second parameter of the consumer is the information that was passed in when the page was added. Example: If the page
+         * was originally added as a MessageEmbed, then you will get a MessageEmbed object back.
+         * 
          * @param messageSelectConsumer The consumer that will be called when the user selects the paginator.
          * @return This Builder.
          */

@@ -4,6 +4,7 @@ import com.tcn.vera.commands.templates.SlashCommandTemplate;
 import com.tcn.vera.eventHandlers.ButtonHandler;
 import com.tcn.vera.pagination.AdvancedEmbedPaginator;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
@@ -24,7 +25,10 @@ public class AdvancedPaginatorCommand extends SlashCommandTemplate {
                 .setEvent(event)
                 .addPageData("Hey! This is an embed.,And this is a very cool description!,#577e4f")
                 .addPageData("WOAH! Is this another embed?,AND another cool description? I can't believe it...,#7869dc")
-                .addPageData("Ok... This is the last one,This must be the last description then,#f78181")
+                .addEmbed(new EmbedBuilder().setTitle("This was passed as a completed embed!").setDescription("This is a cool description!").setColor(Color.decode("#f78181")).build())
+                .addPageData("Ok... This is the second to last one,This must be the second to last description then,#f78181")
+                .addEmbed(new EmbedBuilder().setTitle("This was passed as a completed embed too!").setDescription("This is a cool description!").setColor(Color.decode("#f78181")).build())
+
                 .setButtonHandler(handler)
                 .setUserID(event.getUser().getIdLong())
                 .setEmbedConsumer(AdvancedPaginatorCommand::embedGenerator)
@@ -49,7 +53,11 @@ public class AdvancedPaginatorCommand extends SlashCommandTemplate {
     private static void submenuGenerator(SlashCommandInteractionEvent event, Object pageData){
         //It is important to know that the event response already has your paginator page in it.
         // Be sure to remove any content or buttons you don't want.
-        String pageTitle = ((String) pageData).split(",")[0];
-        event.getHook().editOriginal("You selected the page with the title: \"" + pageTitle + "\"" ).queue();
+        if(pageData instanceof MessageEmbed){
+            event.getHook().editOriginal("You selected an embed" ).queue();
+        } else if (pageData instanceof String) {
+            event.getHook().editOriginal("You selected a pageData" ).queue();
+        }
+
     }
 }
