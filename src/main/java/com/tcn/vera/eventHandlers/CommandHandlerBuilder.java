@@ -42,9 +42,11 @@ public class CommandHandlerBuilder {
 
     private ButtonHandler buttonHandler = null;
 
+    private boolean enableDefaultHelpCommand = true;
+
     public CommandHandler build() {
         runChecks();
-        return new CommandHandler(commandList, botOwner, prefix, buttonHandler);
+        return new CommandHandler(commandList, botOwner, prefix, buttonHandler, enableDefaultHelpCommand);
     }
 
     private void runChecks() {
@@ -131,6 +133,20 @@ public class CommandHandlerBuilder {
      */
     public CommandHandlerBuilder addButtonHandler(ButtonHandler buttonHandler) {
         this.buttonHandler = buttonHandler;
+        return this;
+    }
+
+    /**
+     * Determines if Vera should automatically generate help commands for slash and chat commands based on the name and
+     * help strings provided in the command class. If enabled, help commands will only be generated if commands exist in
+     * their respective categories. If disabled, no help commands will be generated.
+     * <p>
+     * Default value: true
+     * @param enable Generates help commands if true, does not generate help commands if false.
+     * @return This builder
+     */
+    public CommandHandlerBuilder enableDefaultHelpCommand(boolean enable) {
+        this.enableDefaultHelpCommand = enable;
         return this;
     }
 

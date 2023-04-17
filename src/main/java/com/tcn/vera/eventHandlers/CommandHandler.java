@@ -27,6 +27,8 @@
  */
 package com.tcn.vera.eventHandlers;
 
+import com.tcn.vera.commands.builtin.chatHelpCommand;
+import com.tcn.vera.commands.builtin.slashHelpCommand;
 import com.tcn.vera.commands.interactions.*;
 import com.tcn.vera.commands.templates.*;
 import com.tcn.vera.utils.VeraUtils;
@@ -80,7 +82,7 @@ public class CommandHandler extends ListenerAdapter {
     /**
      * To create an instance of this class, please use the {@link CommandHandlerBuilder}.
      */
-    CommandHandler(ArrayList<? extends CommandTemplateBase> commandList, ArrayList<String> botOwner, String prefix, ButtonHandler buttonHandler) {
+    CommandHandler(ArrayList<? extends CommandTemplateBase> commandList, ArrayList<String> botOwner, String prefix, ButtonHandler buttonHandler, boolean enableHelpCommands) {
         logger = LoggerFactory.getLogger("Vera: Command Handler");
         this.botOwner = botOwner;
         this.prefix = prefix;
@@ -131,6 +133,25 @@ public class CommandHandler extends ListenerAdapter {
                 buttonHandler.registerButtonSet(buttonInterface.getButtonClassID(), buttonInterface::executeButton);
             }
         }
+
+        //if help commands are enabled, we need to register them too
+        if(enableHelpCommands) {
+            //register the help commands
+            if(!chatCommandSet.isEmpty() && this.chatCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch("help"::equalsIgnoreCase)){
+                this.chatCommandSet.add(new chatHelpCommand(chatCommandSet, prefix));
+            }else{
+                logger.error("A chat command with the name \"help\" has already been registered. The default chat help command will not be registered. " +
+                        "If this was intentional, you can disable the default help command by setting enableHelpCommands to false in the CommandHandlerBuilder.");
+            }
+
+            if(!slashCommandSet.isEmpty() && this.slashCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch("help"::equalsIgnoreCase)){
+                this.slashCommandSet.add(new slashHelpCommand(slashCommandSet));
+            }else{
+                logger.error("A slash command with the name \"help\" has already been registered. The default slash help command will not be registered. " +
+                        "If this was intentional, you can disable the default help command by setting enableHelpCommands to false in the CommandHandlerBuilder.");
+            }
+        }
+
         logger.info("Registered " + chatCommandSet.size() + " chat command(s).");
         logger.info("Registered " + slashCommandSet.size() + " slash command(s).");
         logger.info("Registered " + userContextCommandSet.size() + " user context menu command(s).");
@@ -458,4 +479,33 @@ public class CommandHandler extends ListenerAdapter {
             }
         });
     }
+
+    /**
+     * @return a copy of all of the chat command objects
+     */
+    public List<ChatCommandTemplate> getChatCommandSet() {
+        return List.copyOf(chatCommandSet);
+    }
+
+    /**
+     * @return a copy of all of the slash command objects
+     */
+    public List<SlashCommandTemplate> getSlashCommandSet() {
+        return List.copyOf(slashCommandSet);
+    }
+
+    /**
+     * @return a copy of all of the autocomplete command objects
+     */
+    public List<UserContextTemplate> getUserContextSet() {
+        return List.copyOf(userContextCommandSet);
+    }
+
+    /**
+     * @return a copy of all of the autocomplete command objects
+     */
+    public List<MessageContextTemplate> getMessageContextSet() {
+        return List.copyOf(messageContextCommandSet);
+    }
+
 }
