@@ -60,6 +60,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
 
     private final boolean hasSelectButton;
 
+    private final boolean addPageNum;
+
     /**
      * Please consider using the AdvancedEmbedPaginatorBuilder to build this object.
      * <p>
@@ -75,14 +77,16 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
      * @param pageBuilder A biconsumer that takes in an {@link EmbedBuilder} and an element of the pageDataList to form a page.
      * @param eventSelectConsumer A consumer that is executed when the 'select' button is pressed on a page of the paginator and the paginator is using a slash command.
      * @param messageSelectConsumer A consumer that is executed when the 'select' button is pressed on a page of the paginator and the paginator is using a chat command.
+     * @param addPageNum Determines if the paginator should add the page number to the footer of the embed when its is being generated and no footer is present.
      */
-    protected AdvancedEmbedPaginator(Message message, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler, ArrayList<Object> pageDataList, ArrayList<MessageEmbed> embedList, BiConsumer<EmbedBuilder, Object> pageBuilder, BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer, BiConsumer<Message, Object> messageSelectConsumer){
+    protected AdvancedEmbedPaginator(Message message, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler, ArrayList<Object> pageDataList, ArrayList<MessageEmbed> embedList, BiConsumer<EmbedBuilder, Object> pageBuilder, BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer, BiConsumer<Message, Object> messageSelectConsumer, boolean addPageNum){
         super(message, commandEvent, numberOfPages, shouldWrap, userID, buttonHandler);
 
         this.pageDataList = pageDataList;
         this.eventSelectConsumer = eventSelectConsumer;
         this.messageSelectConsumer = messageSelectConsumer;
         this.generatedEmbedList = embedList;
+        this.addPageNum = addPageNum;
 
         embedConsumer = pageBuilder;
         hasSelectButton = eventSelectConsumer != null || messageSelectConsumer != null;
@@ -159,11 +163,13 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
         if(generatedEmbedList.size() - 1 >= pagenum && null != generatedEmbedList.get(pagenum)){
             return generatedEmbedList.get(pagenum);
         }
+
+        //executed only if the page hasn't been generated yet
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedConsumer.accept(embedBuilder, pageDataList.get(pagenum));
 
-        //if the embed doesnt have a footer, add one that shows the page number
-        if(embedBuilder.build().getFooter() == null){
+        //if the embed doesn't have a footer, add one that shows the page number if the user wants it
+        if(addPageNum && embedBuilder.build().getFooter() == null){
             embedBuilder.setFooter("Page " + (pagenum + 1) + " of " + numberOfPages);
         }
 
@@ -221,6 +227,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
 
         private BiConsumer<Message, Object> messageSelectConsumer = null;
 
+        private boolean addPageNum = true;
+
         /**
          * Builds the paginator. This method will throw an IllegalArgumentException if the paginator is not valid.
          *
@@ -233,7 +241,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
                 throw new IllegalArgumentException("Cannot build, invalid arguments!");
             }
 
-            return new AdvancedEmbedPaginator(message, commandEvent, pageDataList.size(), shouldWrap, userID, buttonHandler, pageDataList, generatedEmbedList, embedConsumer, eventSelectConsumer, messageSelectConsumer);
+            return new AdvancedEmbedPaginator(message, commandEvent, pageDataList.size(), shouldWrap, userID, buttonHandler, pageDataList, generatedEmbedList, embedConsumer, eventSelectConsumer, messageSelectConsumer, addPageNum);
         }
 
         @Override
@@ -344,6 +352,19 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
          */
         public AdvancedEmbedPaginator.Builder setMessageSelectConsumer(BiConsumer<Message, Object> messageSelectConsumer) {
             this.messageSelectConsumer = messageSelectConsumer;
+            return this;
+        }
+
+        /**
+         * Determines if Vera should add the page number to the footer of a generated embed. This will not overwrite any footer that is already set,
+         * and it does not apply to any pre-made embeds that are added to the paginator. The added footer will be in the format of "Page x of y".
+         * <p>
+         * Default value: true
+         * @param addPageNum Whether or not the paginator should add the page number to the footer of the embed.
+         * @return This Builder.
+         */
+        public AdvancedEmbedPaginator.Builder addPageCounter(boolean addPageNum) {
+            this.addPageNum = addPageNum;
             return this;
         }
     }
