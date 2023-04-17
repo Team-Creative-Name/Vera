@@ -68,13 +68,13 @@ public class EmbedPaginatorCommand extends SlashCommandTemplate {
     private MessageEmbed generateRandomEmbed(){
        return new EmbedBuilder()
                .setTitle("Random Embed " + Math.floor(Math.random() * 100))
-               .setImage("https://source.unsplash.com/random/200x200?sig=" + Math.floor(Math.random() * 1000))
+               .setImage("https://loremflickr.com/320/240?random=" + Math.floor(Math.random() * 1000))
                .setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt" +
                        " ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris" +
                        " nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit" +
                        " esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt" +
                        " in culpa qui officia deserunt mollit anim id est laborum.")
-               .setFooter("This embed was generated randomly. The image was pulled randomly for unsplash.com")
+               .setFooter("This embed was generated randomly. The image was pulled randomly from loremflickr.com")
                .build();
     }
 }
