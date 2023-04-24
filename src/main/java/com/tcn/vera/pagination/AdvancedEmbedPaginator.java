@@ -279,8 +279,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
          * @param pageData The List you would like to add to the page data list.
          * @return This Builder.
          */
-        public AdvancedEmbedPaginator.Builder addPageData(List<Object> pageData){
-            pageDataList.add(pageData);
+        public AdvancedEmbedPaginator.Builder addPageDataList(List<?> pageData){
+            pageDataList.addAll(pageData);
             //ensure the generated embed list is the same size as the pageDataList
             pageData.forEach(o -> generatedEmbedList.add(null));
             return this;
