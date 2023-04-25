@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,40 +92,11 @@ public class CommandHandler extends ListenerAdapter {
         //split the commandList into their respective hashmaps. This allows us to get specific command types easier
         for (CommandTemplateBase command : commandList) {
             switch (command.getCommandType()) {
-                case CHAT_COMMAND -> {
-                    if (this.chatCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
-                        this.chatCommandSet.add((ChatCommandTemplate) command);
-                    } else {
-                        throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
-                                + "\" has already been registered as a chat command. Command names must be unique, lowercase and alphanumeric");
-                    }
-                }
-                case SLASH_COMMAND -> {
-                    if (this.slashCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
-                        this.slashCommandSet.add((SlashCommandTemplate) command);
-                    } else {
-                        throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
-                                + "\" has already been registered as a slash command. Command names must be unique, lowercase and alphanumeric");
-                    }
-                }
-                case USER_CONTEXT_COMMAND -> {
-                    if (this.userContextCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
-                        this.userContextCommandSet.add((UserContextTemplate) command);
-                    } else {
-                        throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
-                                + "\" has already been registered as a user context command. Command names must be unique, lowercase and alphanumeric");
-                    }
-                }
-                case CONTEXT_MESSAGE_COMMAND -> {
-                    if (this.messageContextCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> command.getCommandName().equalsIgnoreCase(c))) {
-                        this.messageContextCommandSet.add((MessageContextTemplate) command);
-                    } else {
-                        throw new IllegalArgumentException("A command with the name \"" + command.getCommandName()
-                                + "\" has already been registered as a message context command. Command names must be unique, lowercase and alphanumeric");
-                    }
-                }
-                default ->
-                        throw new IllegalArgumentException("Sorry, this command handler is only capable of handling Chat, Slash, and Context commands. " +
+                case CHAT_COMMAND -> registerCommand(this.chatCommandSet, (ChatCommandTemplate) command);
+                case SLASH_COMMAND -> registerCommand(this.slashCommandSet, (SlashCommandTemplate) command);
+                case USER_CONTEXT_COMMAND -> registerCommand(this.userContextCommandSet, (UserContextTemplate) command);
+                case CONTEXT_MESSAGE_COMMAND -> registerCommand(this.messageContextCommandSet, (MessageContextTemplate) command);
+                default -> throw new IllegalArgumentException("Sorry, this command handler is only capable of handling Chat, Slash, and Context commands. " +
                                 "If you have created your own command type, you will have to extend this class and add support for it here!");
             }
 
@@ -136,27 +108,44 @@ public class CommandHandler extends ListenerAdapter {
 
         //if help commands are enabled, we need to register them too
         if(enableHelpCommands) {
-            //register the help commands
-            if(!chatCommandSet.isEmpty() && this.chatCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch("help"::equalsIgnoreCase)){
-                this.chatCommandSet.add(new chatHelpCommand(chatCommandSet, prefix));
+            if(!chatCommandSet.isEmpty()){
+                registerCommand(this.chatCommandSet, new chatHelpCommand(chatCommandSet, prefix));
             }else{
-                logger.error("A chat command with the name \"help\" has already been registered. The default chat help command will not be registered. " +
-                        "If this was intentional, you can disable the default help command by setting enableHelpCommands to false in the CommandHandlerBuilder.");
+                logger.debug("No chat commands were registered. The default chat help command will not be registered.");
             }
 
-            if(!slashCommandSet.isEmpty() && this.slashCommandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch("help"::equalsIgnoreCase)){
-                this.slashCommandSet.add(new slashHelpCommand(slashCommandSet));
+            if(!slashCommandSet.isEmpty()){
+                registerCommand(this.slashCommandSet, new slashHelpCommand(slashCommandSet));
             }else{
-                logger.error("A slash command with the name \"help\" has already been registered. The default slash help command will not be registered. " +
-                        "If this was intentional, you can disable the default help command by setting enableHelpCommands to false in the CommandHandlerBuilder.");
+                logger.debug("No slash commands were registered. The default slash help command will not be registered.");
             }
         }
 
-        logger.info("Registered " + chatCommandSet.size() + " chat command(s).");
-        logger.info("Registered " + slashCommandSet.size() + " slash command(s).");
-        logger.info("Registered " + userContextCommandSet.size() + " user context menu command(s).");
-        logger.info("Registered " + messageContextCommandSet.size() + " message context menu command(s).");
+        logger.info("Registered {} chat command(s).", chatCommandSet.size());
+        logger.info("Registered {} slash command(s).", slashCommandSet.size());
+        logger.info("Registered {} user context menu command(s).", userContextCommandSet.size());
+        logger.info("Registered {} message context menu command(s).", messageContextCommandSet.size());
+
     }
+
+
+    private <T extends CommandTemplateBase> void registerCommand(Set<T> commandSet, T toRegister){
+
+        if(toRegister instanceof ChatCommandTemplate toRegisterChat){
+            if(chatCommandSet.stream().flatMap(chatCommandTemplate -> chatCommandTemplate.getAllCommandNames().stream()).noneMatch(existingAlias -> toRegisterChat.getAllCommandNames().contains(existingAlias))){
+                logger.debug("Registering "+ toRegister.getCommandType().toString().toLowerCase() + " with name \"" + toRegister.getCommandName()+ "\" and aliases:" + Arrays.toString(toRegisterChat.getAliases()));
+                commandSet.add(toRegister);
+            }else{
+                logger.error("A chat command with either the name \"" + toRegisterChat.getCommandName() + "\" or one of its aliases " + Arrays.toString(toRegisterChat.getAliases()) + " has already been registered. Command names and aliases must be unique, lowercase and alphanumeric. This command will not be registered.");
+            }
+        }else if (commandSet.stream().map(CommandTemplateBase::getCommandName).noneMatch(c -> toRegister.getCommandName().equalsIgnoreCase(c))) {
+            logger.debug("Registering {} with name \"{}\"", toRegister.getCommandType().toString().toLowerCase(), toRegister.getCommandName());
+            commandSet.add(toRegister);
+        } else {
+            logger.error("A command with the name \"{}\" has already been registered as a {}. Command names must be unique, lowercase and alphanumeric. This command will not be registered.", toRegister.getCommandName(), toRegister.getCommandType().toString().toLowerCase());
+        }
+    }
+
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
