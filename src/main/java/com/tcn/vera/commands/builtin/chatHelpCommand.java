@@ -13,10 +13,9 @@ public class chatHelpCommand extends ChatCommandTemplate {
 
     public chatHelpCommand(Set<ChatCommandTemplate> commandList, String prefix) {
         this.commandName = "help";
-        this.aliases = new String[]{"h", "commands", "cmds"};
         this.help = "Shows this help message containing all chat commands and their descriptions";
         this.isOwnerCommand = false;
-
+        
         this.commandList = commandList;
         this.prefix = prefix;
     }

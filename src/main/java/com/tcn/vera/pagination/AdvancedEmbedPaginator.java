@@ -246,12 +246,14 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
 
         @Override
         protected boolean runAdditionalChecks() {
-            if (embedConsumer == null) {
+            //an embed consumer is required if there are pages that need to be generated
+            if (embedConsumer == null && !pageDataList.isEmpty()) {
                 throw new IllegalArgumentException("You must provide a embed consumer!");
             }
 
-            if (pageDataList.isEmpty()) {
-                throw new IllegalArgumentException("You must provide at least one page of data!");
+            //there has to be at least one pageDataList object or a pre-generated embed
+            if (pageDataList.isEmpty() && generatedEmbedList.isEmpty()) {
+                throw new IllegalArgumentException("You must provide at least one page of data! This can be in the form of a pre-generated embed or a pageData object.");
             }
 
             if (eventSelectConsumer != null && messageSelectConsumer != null) {
@@ -279,8 +281,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
          * @param pageData The List you would like to add to the page data list.
          * @return This Builder.
          */
-        public AdvancedEmbedPaginator.Builder addPageData(List<Object> pageData){
-            pageDataList.add(pageData);
+        public AdvancedEmbedPaginator.Builder addPageDataList(List<?> pageData){
+            pageDataList.addAll(pageData);
             //ensure the generated embed list is the same size as the pageDataList
             pageData.forEach(o -> generatedEmbedList.add(null));
             return this;
