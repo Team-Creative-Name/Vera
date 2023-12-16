@@ -206,11 +206,12 @@ public class SettingsProvider {
         /**
          * Adds a setting to the settings object and file. If a setting with the same name already exists, it will be overwritten.
          * @param settingName The name of the setting that you wish to add.
-         * @param settingValue The value of the setting that you wish to add.
+         * @param defaultValue The default value of the setting that you wish to add. This will be replaced by anything that
+         *                     already exists within the config file.
          * @return This builder.
          */
-        public Builder addSetting(String settingName, String settingValue){
-            defaultSettings.put(settingName, settingValue);
+        public Builder addSetting(String settingName, String defaultValue){
+            defaultSettings.put(settingName, defaultValue);
             return this;
         }
 
