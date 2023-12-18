@@ -354,8 +354,8 @@ public class CommandHandler extends ListenerAdapter {
             try {
                 template.executeChatCommand(event, event.getMessage(), messageContent);
             } catch (final Exception e) {
-                logger.error("Error while executing the \"" + template.getCommandName() + "\" chat command! \n" +
-                        "Exception: " + e.getLocalizedMessage());
+                logger.error("Error while executing the \"" + template.getCommandName() + "\" chat command!");
+                logger.debug("Exception: " + e.getLocalizedMessage());
                 event.getMessage().reply("Sorry, I was unable to finish executing that command. Please try again later.").queue();
             }
         });
@@ -366,10 +366,10 @@ public class CommandHandler extends ListenerAdapter {
             try {
                 template.executeSlashCommand(event);
             } catch (final Exception e) {
-                logger.error("Error while executing the \"" + template.getCommandName() + "\" slash command! \n" +
-                        "Exception: " + e.getLocalizedMessage());
+                logger.error("Error while executing the \"" + template.getCommandName() + "\" slash command!");
+                logger.debug("Exception: " + e.getLocalizedMessage());
                 if (event.isAcknowledged()) {
-                    event.getHook().editOriginal("Sorry, I was unable to finish executing that command. Please try again later.").setActionRow().setEmbeds().queue();
+                    event.getHook().editOriginal("Sorry, I was unable to finish executing that command. Please try again later.").setComponents().setEmbeds().queue();
                 } else {
                     event.reply("Sorry, I was unable to finish executing that command. Please try again later.").setEphemeral(true).queue();
                 }
@@ -384,6 +384,7 @@ public class CommandHandler extends ListenerAdapter {
             } catch (final Exception e) {
                 //we don't really care if this breaks tbh... I'll just log this
                 logger.error("Unable to autocomplete the \"" + event.getFullCommandName() + "\" slash command");
+                logger.debug("Exception: " + e.getLocalizedMessage());
             }
         });
     }
@@ -394,6 +395,7 @@ public class CommandHandler extends ListenerAdapter {
                 buttonHandler.onEvent(event);
             } catch (final Exception e) {
                 logger.error("Button interaction failed! Button ID: " + event.getId());
+                logger.debug("Exception: " + e.getLocalizedMessage());
             }
         });
     }
@@ -403,6 +405,8 @@ public class CommandHandler extends ListenerAdapter {
             try {
                 template.executeStringSelectInteraction(event);
             } catch (Exception e) {
+                logger.error("Unable to execute the \"" + event.getSelectMenu().getId() + "\" string select menu");
+                logger.debug("Exception: " + e.getLocalizedMessage());
                 if (event.isAcknowledged()) {
                     event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
                 } else {
@@ -417,6 +421,8 @@ public class CommandHandler extends ListenerAdapter {
             try {
                 template.executeEntitySelectInteraction(event);
             } catch (Exception e) {
+                logger.error("Unable to execute the \"" + event.getSelectMenu().getId() + "\" entity select menu");
+                logger.debug("Exception: " + e.getLocalizedMessage());
                 if (event.isAcknowledged()) {
                     event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
                 } else {
@@ -431,6 +437,8 @@ public class CommandHandler extends ListenerAdapter {
             try {
                 template.executeModal(event);
             } catch (Exception e) {
+                logger.error("Unable to execute the \"" + event.getModalId() + "\" modal");
+                logger.debug("Exception: " + e.getLocalizedMessage());
                 //this one is very important to catch. The modal will not close unless it gets handled.
                 if (event.isAcknowledged()) {
                     event.getHook().editOriginal("Sorry, I was unable to execute that command. Please try again later").queue();
@@ -446,6 +454,8 @@ public class CommandHandler extends ListenerAdapter {
             try {
                 template.executeUserContextCommand(event);
             } catch (final Exception e) {
+                logger.error("Error while executing the \"" + template.getCommandName() + "\" user context command!");
+                logger.debug("Exception: " + e.getLocalizedMessage());
                 if (event.isAcknowledged()) {
                     event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
                 } else {
@@ -460,6 +470,8 @@ public class CommandHandler extends ListenerAdapter {
             try {
                 template.executeMessageContextCommand(event);
             } catch (final Exception e) {
+                logger.error("Error while executing the \"" + template.getCommandName() + "\" message context command!");
+                logger.debug("Exception: " + e.getLocalizedMessage());
                 if (event.isAcknowledged()) {
                     event.getHook().editOriginal("Sorry, I was unable to execute that command").queue();
                 } else {

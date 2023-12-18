@@ -246,3 +246,9 @@ gradle-app.setting
 .idea/discord.xml
 
 src/test/java/com/tcn/vera/Secrets.java
+
+.idea/modules/Vera.main.iml
+
+.idea/modules/Vera.test.iml
+
+.idea/Vera.iml
