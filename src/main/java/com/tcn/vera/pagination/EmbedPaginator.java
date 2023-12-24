@@ -84,16 +84,8 @@ public class EmbedPaginator extends PaginatorBase {
     }
 
     @Override
-    protected void showPage() {
-        if (isCommand) {
-            commandEvent.getHook().editOriginalComponents().setEmbeds(embedList.get(currentPage)).setActionRow(buttonList).queue();
-        } else {
-            if(sentMessage == null){
-                sentMessage = message.getChannel().sendMessageEmbeds(embedList.get(currentPage)).setActionRow(buttonList).complete();
-            }else{
-                sentMessage.editMessageEmbeds(embedList.get(currentPage)).setActionRow(buttonList).queue();
-            }
-        }
+    protected MessageEmbed getMenuEmbed(int pageNum) {
+        return embedList.get(pageNum);
     }
 
     public static class Builder extends PaginatorBase.Builder<EmbedPaginator.Builder, EmbedPaginator> {

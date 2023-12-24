@@ -35,6 +35,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +102,9 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
                 addButton(Button.success(getFullButtonID("success"), "Select This"));
             }
             addButton(Button.primary(getFullButtonID("next"),  Emoji.fromUnicode("\u27A1")));
+        } else if (hasSelectButton) {
+            addButton(Button.danger(getFullButtonID("stop"), Emoji.fromUnicode("\uD83D\uDDD1")));
+            addButton(Button.success(getFullButtonID("success"), "Select This"));
         }
     }
 
@@ -159,7 +165,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
         }
     }
 
-    private MessageEmbed getMenuEmbed(int pagenum){
+    protected MessageEmbed getMenuEmbed(int pagenum){
         if(generatedEmbedList.size() - 1 >= pagenum && null != generatedEmbedList.get(pagenum)){
             return generatedEmbedList.get(pagenum);
         }
@@ -176,19 +182,6 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
         generatedEmbedList.set(pagenum, embedBuilder.build());
 
         return embedBuilder.build();
-    }
-
-    @Override
-    protected void showPage() {
-        if (isCommand) {
-            commandEvent.getHook().editOriginalComponents().setEmbeds(getMenuEmbed(currentPage)).setActionRow(buttonList).queue();
-        } else {
-            if(sentMessage == null){
-                sentMessage = message.getChannel().sendMessageEmbeds(getMenuEmbed(currentPage)).setActionRow(buttonList).complete();
-            }else{
-                sentMessage.editMessageEmbeds(getMenuEmbed(currentPage)).setActionRow(buttonList).queue();
-            }
-        }
     }
 
     @Override

@@ -29,10 +29,14 @@ package com.tcn.vera.pagination;
 
 import com.tcn.vera.eventHandlers.ButtonHandler;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,8 +92,35 @@ public abstract class PaginatorBase {
 
     /**
      * The method called when a page is shown. This method should be overridden by the child class.
+     *
+     * @param pageNum The page number that should be shown.
+     * @return The embed that should be shown.
      */
-    protected abstract void showPage();
+    protected abstract MessageEmbed getMenuEmbed(int pageNum);
+
+    /**
+     * The method called when a page is shown. If a different implementation is needed, it is ok to override this method
+     * as long as everything is covered.
+     */
+    protected void showPage(){
+        if (isCommand) {
+            WebhookMessageEditAction<Message> messageEdit = commandEvent.getHook().editOriginalComponents().setEmbeds(getMenuEmbed(currentPage));
+            messageEdit = !buttonList.isEmpty() ? messageEdit.setActionRow(buttonList) : messageEdit.setComponents();
+            messageEdit.queue();
+
+        } else {
+            if(sentMessage == null){
+                MessageCreateAction messageEdit = message.getChannel().sendMessageEmbeds(getMenuEmbed(currentPage));
+                messageEdit = !buttonList.isEmpty() ? messageEdit.setActionRow(buttonList) : messageEdit.setComponents();
+                sentMessage = messageEdit.complete();
+
+            }else{
+                MessageEditAction messageEdit =  sentMessage.editMessageEmbeds(getMenuEmbed(currentPage));
+                messageEdit = !buttonList.isEmpty() ? messageEdit.setActionRow(buttonList) : messageEdit.setComponents();
+                messageEdit.queue();
+            }
+        }
+    }
 
     /**
      * Shows the paginator at a specific page number.
