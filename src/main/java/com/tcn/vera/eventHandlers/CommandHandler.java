@@ -180,17 +180,18 @@ public class CommandHandler extends ListenerAdapter {
             ).findFirst().orElse(null);
 
             if (null != command) {
+                String trimmedMessageContent = rawMessage.substring(commandName.length() + 1).trim();
                 if (command.isOwnerCommand()) {
                     if (botOwner.stream().anyMatch(c -> c.equalsIgnoreCase(event.getAuthor().getId()))) {
                         logger.debug(event.getAuthor().getName() + " has used the \"" + command.getCommandName() + "\" chat command");
-                        executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
+                        executeChatCommand(command, event, trimmedMessageContent);
                     } else {
                         logger.warn(event.getAuthor().getName() + " has attempted to use the \"" + command.getCommandName()
                                 + "\" owner chat command without being on the list of owners!");
                     }
                 } else {
                     logger.debug(event.getAuthor().getName() + " has used the \"" + command.getCommandName() + "\" chat command");
-                    executeChatCommand(command, event, rawMessage.substring(commandName.length() + 1));
+                    executeChatCommand(command, event, trimmedMessageContent);
                 }
             }
         }
