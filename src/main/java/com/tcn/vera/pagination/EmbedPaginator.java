@@ -55,7 +55,7 @@ public class EmbedPaginator extends PaginatorBase {
         if (numberOfPages > 1) {
             //left, stop, right buttons
             addButton(Button.primary(getFullButtonID("previous"), Emoji.fromUnicode("\u2B05")));
-            addButton(Button.danger(getFullButtonID("stop"), Emoji.fromUnicode("\uD83D\uDDD1️")));
+            addButton(Button.danger(getFullButtonID("stop"), Emoji.fromUnicode("\uD83D\uDDD1")));
             addButton(Button.primary(getFullButtonID("next"), Emoji.fromUnicode("\u27A1")));
         }
     }
