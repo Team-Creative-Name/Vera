@@ -237,8 +237,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
         @Override
         protected boolean runAdditionalChecks() {
             //an embed consumer is required if there are pages that need to be generated
-            if (embedConsumer == null && !pageDataList.isEmpty()) {
-                throw new IllegalArgumentException("You must provide a embed consumer!");
+            if (embedConsumer == null && !isListEmpty(pageDataList)) {
+                throw new IllegalArgumentException("You must provide a embed consumer if embeds need generated!");
             }
 
             //there has to be at least one pageDataList object or a pre-generated embed
@@ -358,6 +358,15 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
         public AdvancedEmbedPaginator.Builder addPageCounter(boolean addPageNum) {
             this.addPageNum = addPageNum;
             return this;
+        }
+
+        private boolean isListEmpty(List<?> list){
+            for (Object o : list) {
+                if (o != null) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
