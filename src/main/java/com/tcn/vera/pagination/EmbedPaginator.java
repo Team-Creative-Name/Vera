@@ -48,8 +48,8 @@ public class EmbedPaginator extends PaginatorBase {
     private final ArrayList<MessageEmbed> embedList;
 
 
-    public EmbedPaginator(Message message, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ArrayList<MessageEmbed> embedList, ButtonHandler buttonHandler) {
-        super(message, commandEvent, numberOfPages, shouldWrap, userID, buttonHandler);
+    public EmbedPaginator(Message message, Message sentMessage, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ArrayList<MessageEmbed> embedList, ButtonHandler buttonHandler) {
+        super(message,sentMessage, commandEvent, numberOfPages, shouldWrap, userID, buttonHandler);
         this.embedList = embedList;
 
         if (numberOfPages > 1) {
@@ -104,7 +104,7 @@ public class EmbedPaginator extends PaginatorBase {
             }
 
             //calculate the number of pages
-            return new EmbedPaginator(message, commandEvent, embedList.size(), shouldWrap, userID, (ArrayList<MessageEmbed>) embedList, buttonHandler);
+            return new EmbedPaginator(message,sentMessage, commandEvent, embedList.size(), shouldWrap, userID, (ArrayList<MessageEmbed>) embedList, buttonHandler);
         }
 
         @Override

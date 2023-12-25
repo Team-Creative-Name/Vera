@@ -56,13 +56,13 @@ public class AdvancedPaginatorCommand extends SlashCommandTemplate {
         embedBuilder.setColor(Color.decode(splitData[2]));
     }
 
-    private static void submenuGenerator(SlashCommandInteractionEvent event, Object pageData){
+    private static void submenuGenerator(AdvancedEmbedPaginator paginator, Object pageData){
         //It is important to know that the event response already has your paginator page in it.
         // Be sure to remove any content or buttons you don't want.
         if(pageData instanceof MessageEmbed){
-            event.getHook().editOriginal("You selected an embed" ).queue();
+            paginator.getSlashCommandEvent().getHook().editOriginal("You selected an embed" ).queue();
         } else if (pageData instanceof String) {
-            event.getHook().editOriginal("You selected a pageData" ).queue();
+            paginator.getSlashCommandEvent().getHook().editOriginal("You selected a pageData" ).queue();
         }
 
     }

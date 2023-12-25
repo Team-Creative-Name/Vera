@@ -35,9 +35,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
-import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +55,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
     private final ArrayList<Object> pageDataList;
     private final BiConsumer<EmbedBuilder, Object> embedConsumer;
 
-    private final BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer;
-    private final BiConsumer<Message, Object> messageSelectConsumer;
+    private final BiConsumer<AdvancedEmbedPaginator, Object> eventSelectConsumer;
+    private final BiConsumer<AdvancedEmbedPaginator, Object> messageSelectConsumer;
 
     private final boolean hasSelectButton;
 
@@ -82,8 +79,8 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
      * @param messageSelectConsumer A consumer that is executed when the 'select' button is pressed on a page of the paginator and the paginator is using a chat command.
      * @param addPageNum Determines if the paginator should add the page number to the footer of the embed when its is being generated and no footer is present.
      */
-    protected AdvancedEmbedPaginator(Message message, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler, ArrayList<Object> pageDataList, ArrayList<MessageEmbed> embedList, BiConsumer<EmbedBuilder, Object> pageBuilder, BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer, BiConsumer<Message, Object> messageSelectConsumer, boolean addPageNum){
-        super(message, commandEvent, numberOfPages, shouldWrap, userID, buttonHandler);
+    protected AdvancedEmbedPaginator(Message message, Message sentMessage, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler, ArrayList<Object> pageDataList, ArrayList<MessageEmbed> embedList, BiConsumer<EmbedBuilder, Object> pageBuilder, BiConsumer<AdvancedEmbedPaginator, Object> eventSelectConsumer, BiConsumer<AdvancedEmbedPaginator, Object> messageSelectConsumer, boolean addPageNum){
+        super(message,sentMessage, commandEvent, numberOfPages, shouldWrap, userID, buttonHandler);
 
         this.pageDataList = pageDataList;
         this.eventSelectConsumer = eventSelectConsumer;
@@ -158,9 +155,9 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
         }
         if (hasSelectButton) {
             if (isCommand) {
-                eventSelectConsumer.accept(commandEvent, toSend);
+                eventSelectConsumer.accept(this, toSend);
             } else {
-                messageSelectConsumer.accept(sentMessage, toSend);
+                messageSelectConsumer.accept(this, toSend);
             }
         }
     }
@@ -216,9 +213,9 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
 
         private final ArrayList<MessageEmbed> generatedEmbedList = new ArrayList<>();
 
-        private BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer = null;
+        private BiConsumer<AdvancedEmbedPaginator, Object> eventSelectConsumer = null;
 
-        private BiConsumer<Message, Object> messageSelectConsumer = null;
+        private BiConsumer<AdvancedEmbedPaginator, Object> messageSelectConsumer = null;
 
         private boolean addPageNum = true;
 
@@ -234,7 +231,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
                 throw new IllegalArgumentException("Cannot build, invalid arguments!");
             }
 
-            return new AdvancedEmbedPaginator(message, commandEvent, pageDataList.size(), shouldWrap, userID, buttonHandler, pageDataList, generatedEmbedList, embedConsumer, eventSelectConsumer, messageSelectConsumer, addPageNum);
+            return new AdvancedEmbedPaginator(message,sentMessage, commandEvent, pageDataList.size(), shouldWrap, userID, buttonHandler, pageDataList, generatedEmbedList, embedConsumer, eventSelectConsumer, messageSelectConsumer, addPageNum);
         }
 
         @Override
@@ -329,7 +326,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
          * @param eventSelectConsumer The consumer that will be called when the user selects the paginator.
          * @return This Builder.
          */
-        public AdvancedEmbedPaginator.Builder setEventSelectConsumer(BiConsumer<SlashCommandInteractionEvent, Object> eventSelectConsumer){
+        public AdvancedEmbedPaginator.Builder setEventSelectConsumer(BiConsumer<AdvancedEmbedPaginator, Object> eventSelectConsumer){
             this.eventSelectConsumer = eventSelectConsumer;
             return this;
         }
@@ -345,7 +342,7 @@ public class AdvancedEmbedPaginator extends PaginatorBase{
          * @param messageSelectConsumer The consumer that will be called when the user selects the paginator.
          * @return This Builder.
          */
-        public AdvancedEmbedPaginator.Builder setMessageSelectConsumer(BiConsumer<Message, Object> messageSelectConsumer) {
+        public AdvancedEmbedPaginator.Builder setMessageSelectConsumer(BiConsumer<AdvancedEmbedPaginator, Object> messageSelectConsumer) {
             this.messageSelectConsumer = messageSelectConsumer;
             return this;
         }

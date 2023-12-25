@@ -5,18 +5,17 @@ import com.tcn.vera.eventHandlers.ButtonHandler;
 import com.tcn.vera.pagination.AdvancedEmbedPaginator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 
-public class AdvancedPaginatorMessage extends ChatCommandTemplate {
+public class AdvancedPaginator2Message extends ChatCommandTemplate {
 
-    private final ButtonHandler buttonHandler;
+    private static ButtonHandler buttonHandler;
 
-    public AdvancedPaginatorMessage(ButtonHandler buttonHandler) {
-        this.commandName = "advancedPaginatorMessage";
-        this.buttonHandler = buttonHandler;
+    public AdvancedPaginator2Message(ButtonHandler buttonHandler) {
+        this.commandName = "ap2m";
+        AdvancedPaginator2Message.buttonHandler = buttonHandler;
     }
 
     @Override
@@ -30,8 +29,8 @@ public class AdvancedPaginatorMessage extends ChatCommandTemplate {
                 .addPageData("Ok... This is the last one,This must be the last description then,#f78181")
                 .setButtonHandler(buttonHandler)
                 .setUserID(event.getAuthor().getIdLong())
-                .setEmbedConsumer(AdvancedPaginatorMessage::embedGenerator)
-                .setMessageSelectConsumer(AdvancedPaginatorMessage::submenuGenerator)
+                .setEmbedConsumer(AdvancedPaginator2Message::embedGenerator)
+                .setMessageSelectConsumer(AdvancedPaginator2Message::submenuGenerator)
                 .build();
 
         paginator.paginate();
@@ -51,9 +50,18 @@ public class AdvancedPaginatorMessage extends ChatCommandTemplate {
     }
 
     private static void submenuGenerator(AdvancedEmbedPaginator paginator, Object pageData){
-        //It is important to know that the event response already has your paginator page in it.
-        // Be sure to remove any content or buttons you don't want.
-        String pageTitle = ((String) pageData).split(",")[0];
-        paginator.getSentMessage().editMessage("You selected the page with the title: \"" + pageTitle + "\"" ).queue();
+        paginator.getSentMessage().editMessage("This is the secondary menu!").queue();
+
+        AdvancedEmbedPaginator paginator2 = new AdvancedEmbedPaginator.Builder()
+                .setSentMessage(paginator.getSentMessage())
+                .addPageData("Selected paginator 1,And this is a very cool description!,#577e4f")
+                .addPageData("Selected paginator 2,AND another cool description? I can't believe it...,#7869dc")
+                .addPageData("Selected paginator 3,This must be the last description then,#f78181")
+                .setButtonHandler(buttonHandler)
+                .setUserID(paginator.getUserID())
+                .setEmbedConsumer(AdvancedPaginator2Message::embedGenerator)
+                .build();
+
+        paginator2.paginate();
     }
 }

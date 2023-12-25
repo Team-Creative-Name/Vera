@@ -49,7 +49,7 @@ import java.util.List;
 public abstract class PaginatorBase {
 
     protected final Message message;
-    protected Message sentMessage = null;
+    protected Message sentMessage;
 
     protected final SlashCommandInteractionEvent commandEvent;
     protected final long userID;
@@ -64,17 +64,18 @@ public abstract class PaginatorBase {
     protected List<Button> buttonList = new ArrayList<>();
 
 
-    protected PaginatorBase(Message message, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler) {
+    protected PaginatorBase(Message message, Message sentMessage, SlashCommandInteractionEvent commandEvent, int numberOfPages, boolean shouldWrap, long userID, ButtonHandler buttonHandler) {
         this.message = message;
+        this.sentMessage = sentMessage;
         this.commandEvent = commandEvent;
         this.numberOfPages = numberOfPages;
         this.shouldWrap = shouldWrap;
         this.userID = userID;
         this.buttonHandler = buttonHandler;
 
-        if (message == null && commandEvent != null) {
+        if (message == null && sentMessage == null && commandEvent != null ) {
             isCommand = true;
-        } else if (message != null && commandEvent == null) {
+        } else if ((message != null || sentMessage != null) && commandEvent == null) {
             isCommand = false;
         } else {
             throw new IllegalArgumentException("This paginator cannot be in response to both a message and a command at the same time!");
@@ -155,15 +156,12 @@ public abstract class PaginatorBase {
     }
 
     /**
-     * Used to generate the base ID of a button via the message ID and the discord user ID.
+     * Used to generate the base ID of a button via the object hash and the discord user ID.
      *
      * @return A string representing the base ID of the button.
      */
     public String getButtonID() {
-        if (isCommand) {
-            return commandEvent.getHook().retrieveOriginal().complete().getId() + ":" + userID;
-        }
-        return message.getId() + ":" + userID;
+        return this.hashCode() + ":" + userID;
     }
 
     /**
@@ -238,10 +236,54 @@ public abstract class PaginatorBase {
         //if there is no sent message there is no message to delete
     }
 
+    //** public getter methods for submenu creation **//
+
+    /**
+     * Gets the original message that triggered the paginator. This will be null if the paginator was responding to a command
+     * or if the paginator was created with a previously sent message.
+     * @return The original message that triggered the paginator.
+     */
+    public Message getMessage() {
+        return message;
+    }
+
+    /**
+     * Gets the message that the paginator is using to display the pages. This will be null if the paginator was created in response to a command.
+     * @return The message that the paginator is using to display the pages.
+     */
+    public Message getSentMessage() {
+        return sentMessage;
+    }
+
+    /**
+     * Gets the event that triggered the paginator. This will be null if the paginator was created with a chat command or sent message
+     * @return The Slash Command Event that triggered the paginator.
+     */
+    public SlashCommandInteractionEvent getSlashCommandEvent() {
+        return commandEvent;
+    }
+
+    /**
+     * Gets the id of the user who triggered the paginator.
+     * @return The id of the user who triggered the paginator.
+     */
+    public long getUserID() {
+        return userID;
+    }
+
+    /**
+     * Gets the button handler that the paginator is using.
+     * @return The button handler that the paginator is using.
+     */
+    public ButtonHandler getbuttonHandler() {
+        return buttonHandler;
+    }
+
     @SuppressWarnings("unchecked")
     protected abstract static class Builder<T extends Builder<T, V>, V extends PaginatorBase> {
         protected boolean shouldWrap = true;
         protected Message message;
+        protected Message sentMessage;
         protected SlashCommandInteractionEvent commandEvent;
 
         protected long userID = -1;
@@ -259,6 +301,17 @@ public abstract class PaginatorBase {
             if (null == buttonHandler) {
                 throw new IllegalStateException("A paginator MUST have a button handler!");
             }
+
+            if(userID == -1){
+                if(commandEvent != null){
+                    userID = commandEvent.getUser().getIdLong();
+                }else if(message != null){
+                    userID = message.getAuthor().getIdLong();
+                }else{
+                    throw new IllegalArgumentException("The paginator must be passed a user ID if it is not responding to an event!");
+                }
+            }
+
 
             return runAdditionalChecks();
         }
@@ -311,6 +364,17 @@ public abstract class PaginatorBase {
          */
         public final T setEvent(MessageReceivedEvent event) {
             this.message = event.getMessage();
+            return (T) this;
+        }
+
+        /**
+         * Sets the message that the paginator should use instead of creating a new one. Any text in the message will remain, but the embeds and buttons will be replaced.
+         * This will override the event if it is set.
+         * @param message The message that the paginator should use instead of creating a new one.
+         * @return The builder.
+         */
+        public final T setSentMessage(Message message) {
+            this.sentMessage = message;
             return (T) this;
         }
 
